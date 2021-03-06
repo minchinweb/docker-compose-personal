@@ -31,28 +31,5 @@
                  }
              }
          }
-    },
-    "firewall": {
-        "name": {
-            "WAN_OUT": {
-                "default-action": "accept",
-                "description": "Packets to Internet",
-                "rule": {
-                    "2000": {
-                        "action": "drop",
-                        "description": "Bayeux disconnected at night",
-                        "log": "enable",
-                        "source": {
-                            "mac-address": "bc:ae:c5:07:01:a6"
-                        },
-                        "protocol": "all",
-                        "time": {
-                            "starttime": "23:59:00",
-                            "stoptime": "06:00:00"
-                        }
-                    }
-                }
-            }
-        }
     }
 }
