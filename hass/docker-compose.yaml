@@ -1,0 +1,43 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  # home automation
+  homeassistant:
+    image: homeassistant/home-assistant:0.110.4  #0.110.2
+    # hostname: traefik
+    container_name: hass
+    environment:
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=${TZ}
+    volumes:
+    #   - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DOCKER_USERDIR}/volumes/homeassistant:/config
+    restart: unless-stopped
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.port=8123  # internal container port
+    #   - traefik.docker.network=frontend_external
+      # - traefik.docker.domain=${LOCAL_DOMAIN_NAME}
+      # - traefik.docker.exposedByDefault=false
+      # - traefik.docker.watch=true
+    #   - traefik.http.routers.traefik-container.rule=Host("traefik.${LOCAL_DOMAIN_NAME}")  # 2.0
+    #   - traefik.http.services.traefik-container.loadbalancer.server.port=8080  # internal port, when multiple ports are exposed
+    #   - traefik.providers.docker.exposedByDefault=false
+      # - traefik.http.routers.traefik-container.rule=Host("${LOCAL_DOMAIN_NAME}") && PathPrefix("/traefik")  # 2.0
+      # - traefik.http.middlewares.traefik-container.stripprefix.prefixes=/traefik
+
+      ## HTTP --> HTTPS redirect
+      # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+    networks:
+      default:
+        ipv4_address: "192.168.1.221"
+
+networks:
+  default:
+    external:
+      name: unifi_myvlan
+

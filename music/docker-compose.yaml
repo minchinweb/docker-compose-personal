@@ -1,0 +1,46 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  musicbranz:
+    image: linuxserver/musicbrainz
+    # container_name: musicbrainz
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - BRAINZCODE=${MUSICBRAINZ_API_TOKEN}
+      - WEBADDRESS=192.168.1.114
+      # - NPROC=parameter #optional, number of processes, default is 5
+    volumes:
+      - "${DOCKER_USERDIR}/volumes/musicbranz/config:/config"
+      - "${DOCKER_USERDIR}/volumes/musicbranz/data:/data"
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    # treafik seems to timeout
+    labels:
+      - traefik.enable=ture
+      - traefik.port=5000
+      - "traefik.frontend.rule=Host:musicbrainz.${LOCAL_DOMAIN_NAME}"  
+
+  beets:
+    image: linuxserver/beets
+    # container_name: beets
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - "${DOCKER_USERDIR}/volumes/beets:/config"
+      - "${NAS_DIR}/music/Music:/music"
+      - "${NAS_DIR}/music/To ReTag:/downloads"
+    ports:
+      - 9928:8337
+    restart: unless-stopped
+    labels:
+      - traefik.enable=ture
+      - traefik.port=8337
+      - "traefik.frontend.rule=Host:beets.${LOCAL_DOMAIN_NAME}" 

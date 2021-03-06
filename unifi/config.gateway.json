@@ -1,0 +1,58 @@
+{
+    "service": {
+        "nat": {
+            "rule": {
+                 "1": {
+                     "description": "Redirect DNS queries to Pi-Hole",
+                     "destination": {
+                         "port": "53",
+                         "address": "!192.168.1.84"
+                     },
+                     "source": {
+                         "address": "!192.168.1.84"
+                     },
+                     "inside-address": {
+                         "address": "192.168.1.84",
+                         "port": "53"
+                     },
+                     "inbound-interface": "eth0",
+                     "protocol": "tcp_udp",
+                     "type": "destination"
+                 },
+                 "5002": {
+                     "description": "Translate DNS reply back",
+                     "destination": {
+                         "address": "192.168.1.84",
+                         "port": "53"
+                     },
+                     "outbound-interface": "eth0",
+                     "protocol": "tcp_udp",
+                     "type": "masquerade"
+                 }
+             }
+         }
+    },
+    "firewall": {
+        "name": {
+            "WAN_OUT": {
+                "default-action": "accept",
+                "description": "Packets to Internet",
+                "rule": {
+                    "2000": {
+                        "action": "drop",
+                        "description": "Bayeux disconnected at night",
+                        "log": "enable",
+                        "source": {
+                            "mac-address": "bc:ae:c5:07:01:a6"
+                        },
+                        "protocol": "all",
+                        "time": {
+                            "starttime": "23:59:00",
+                            "stoptime": "06:00:00"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

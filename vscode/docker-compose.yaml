@@ -1,0 +1,83 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+
+  # vscode:
+  #   image: codercom/code-server:1.1156-vsc1.33.1
+  #   # https://github.com/codercom/code-server
+  #   # version 2 is out, but I can't (quickly) find a sample docker-compose file
+  #   restart: unless-stopped
+  #   # command:
+  #   #   - --password ${VSCODE_PASSWORD}
+  #   #   - --no-auth
+  #   #   - --cert=/shared/certs/traefik.crt
+  #   #   - --cert-key=/shared/certs/traefik.key
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - PASSWORD=${VSCODE_PASSWORD}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/sorbonne:/home/coder/sorbonne
+  #     - ${DOCKER_USERDIR}/build:/home/coder/builders
+  #     - ${DOCKER_USERDIR}/compose:/home/coder/compose
+  #     # - ${DOCKER_USERDIR}/volumes:/home/coder/docker
+  #     - ${DOCKER_USERDIR}/volumes/homeassistant:/home/coder/volumes/homeassistant
+  #     - ${DOCKER_USERDIR}/volumes/traefik:/home/coder/volumes/traefik
+  #     - ${DOCKER_USERDIR}/volumes/code-server:/home/coder/.local/share/code-server
+  #     - ${DOCKER_USERDIR}/volumes/unifi/data/sites/default:/home/coder/volumes/unifi
+  #     # - ${DOCKER_USERDIR}/volumes/shared:/shared
+  #   ports:
+  #     - 9911:8443
+  #   labels:
+  #     # doesn't work as either a subdomain or a folder with traefik
+  #     - traefik.enable=false
+
+  vscodo-lsio:
+    image: linuxserver/code-server
+    container_name: vscode
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PASSWORD=${VSCODE_PASSWORD}
+      # - SUDO_PASSWORD=password #optional 
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/code-server-lsio:/config
+      - ${DOCKER_USERDIR}/sorbonne:/config/docker/sorbonne
+      - ${DOCKER_USERDIR}/build:/config/docker/builders
+      - ${DOCKER_USERDIR}/compose:/config/docker/compose
+      - ${DOCKER_USERDIR}/volumes/homeassistant:/config/docker/volumes/homeassistant
+      - ${DOCKER_USERDIR}/volumes/homeassistant.old:/config/docker/volumes/homeassistant.old
+      - ${DOCKER_USERDIR}/volumes/traefik:/config/docker/volumes/traefik
+      - ${DOCKER_USERDIR}/volumes/unifi/data/sites/default:/config/docker/volumes/unifi
+      - ${DOCKER_USERDIR}/volumes/ngircd:/config/docker/volumes/ngircd
+      - ${DOCKER_USERDIR}/volumes/thelounge:/config/docker/volumes/thelounge
+      # - ${DOCKER_USERDIR}/volumes/shared:/shared
+    ports:
+      # - 9934:8443
+      - 9911:8443
+    labels:
+      # coder.com version doesn't work as either a subdomain or a folder with traefik
+      # - traefik.enable=false
+      - traefik.enable=true
+      - traefik.http.routers.vscode.rule=Host("code.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.vscode.entrypoints=web
+      - traefik.http.routers.vscode.middlewares=vscode-to-https
+
+      - traefik.http.routers.vscodesecure.rule=Host("code.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.vscodesecure.entrypoints=websecure
+      - traefik.http.routers.vscodesecure.tls=true
+      # - traefik.http.routers.vscodesecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.vscode-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.vscode-to-https.redirectscheme.permanent=true
+
+
+networks:
+  default:
+    external:
+      name: frontend_external

@@ -1,0 +1,113 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  # meta
+  traefik:
+    image: traefik:2.3
+    command:
+      # - --configFile=/config/traefik.old.toml
+      # - --accessLog.filePath=/var/log/access.log
+      # - --accessLog.filters.statusCodes=400-499
+      - --api.insecure=true  # 2.0
+      - --providers.docker  # 2.0
+      - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.${LOCAL_DOMAIN_NAME}`)
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --entrypoints.web.forwardedHeaders.trustedIPs=192.168.1.1
+      - --entrypoints.websecure.forwardedHeaders.trustedIPs=192.168.1.1
+      # HTTPS Certificate
+      - --certificatesResolvers.myresolver.acme.email=${TRAEFIK_ACME_EMAIL}
+      - --certificatesResolvers.myresolver.acme.storage=/etc/traefik/acme/acme.json
+      - --certificatesResolvers.myresolver.acme.httpChallenge.entryPoint=web
+      # access logs visible through stdout
+      - --accesslog=true
+      - --accesslog.filters.statuscodes=300-599  # so not 200 (success)
+      - --accesslog.filters.minduration=10ms
+      - --accesslog.filters.retryattempts
+      - --accesslog.filepath=/var/log/access.log
+      # TODO: push stats to InfluxDB
+    hostname: traefik
+    container_name: traefik
+    ports:
+      - 80:80
+      - 443:443
+      - 9916:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DOCKER_USERDIR}/volumes/traefik/config:/config:ro
+      - ${DOCKER_USERDIR}/volumes/traefik/acme:/etc/traefik/acme
+      - ${DOCKER_USERDIR}/volumes/traefik/logs:/var/log
+      - ${DOCKER_USERDIR}/volumes/shared:/shared
+    restart: always
+    labels:
+      - traefik.enable=true
+      # - traefik.port=8080  # internal container port
+      - traefik.docker.network=frontend_external
+      # - traefik.docker.domain=${LOCAL_DOMAIN_NAME}
+      # - traefik.docker.exposedByDefault=false
+      # - traefik.docker.watch=true
+      - traefik.http.routers.traefik-container.rule=Host("traefik.${LOCAL_DOMAIN_NAME}")  # 2.0
+      - traefik.http.services.traefik-container.loadbalancer.server.port=8080  # internal port, when multiple ports are exposed
+      - traefik.providers.docker.exposedByDefault=false
+      # - traefik.http.routers.traefik-container.rule=Host("${LOCAL_DOMAIN_NAME}") && PathPrefix("/traefik")  # 2.0
+      # - traefik.http.middlewares.traefik-container.stripprefix.prefixes=/traefik
+
+      ## HTTP --> HTTPS redirect
+      # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+    networks:
+      external:
+              
+  fail2ban:
+    image: crazymax/fail2ban:latest
+    container_name: fail2ban
+    network_mode: "host"
+    restart: always
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/traefik/logs:/var/log:ro
+      - ${DOCKER_USERDIR}/volumes/fail2ban/data:/data
+    labels:
+      - traefik.enable=false
+
+  landingpage:
+    # serve a static file as the "landing page"
+    image: halverneus/static-file-server
+    restart: always
+    environment:
+      - FOLDER=/config
+      - DEBUG=true
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/landing:/config
+      # - /etc/localtime:/etc/localtime:ro  # doesn't make a difference
+    ports:
+      - 9918:8080
+    networks:
+      external:
+    labels:
+      - traefik.enable=true
+      # - traefik.http.routers.landingpage.rule=Host("${LOCAL_DOMAIN_NAME}") || Host("${PUBLIC_DOMAIN_NAME}")
+      
+      # declare both the HTTP and HTTPS versions, and then a middleware
+      # that redirects HTTP --> HTTPS
+      - traefik.http.routers.landingpage.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.landingpage.entrypoints=web
+      - traefik.http.routers.landingpage.middlewares=landingpage-to-https
+
+      - traefik.http.routers.landingpagesecure.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.landingpagesecure.entrypoints=websecure
+      - traefik.http.routers.landingpagesecure.tls=true
+      - traefik.http.routers.landingpagesecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.landingpage-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.landingpage-to-https.redirectscheme.permanent=true
+
+      - traefik.http.routers.landingpageinternal.rule=Host("${LOCAL_DOMAIN_NAME}")
+
+networks:
+  external:
+

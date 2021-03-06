@@ -1,0 +1,91 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  portainer:
+    # Portainer - WebUI for Containers
+    image: portainer/portainer-ce
+    # container_name: portainer
+    hostname: portainer
+    environment:
+      - TZ=${TZ}
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - 9900:9000
+      # - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_USERDIR}/volumes/portainer/data:/data
+      - ${DOCKER_USERDIR}/volumes/shared:/shared
+    # networks:
+    #   external:
+    labels:
+      - traefik.enable=true
+      # doesn't seem to work on path; never connects to Docker deamon
+      - traefik.http.routers.portainer.rule=Host("portainer.${LOCAL_DOMAIN_NAME}")
+
+      # docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
+
+  watchtower:
+    # Watchtower - Automatic Update of Containers/Apps
+    #
+    # no UI, but possible to get notifications on updates via email or Slack
+    # configure through ENV section
+    image: v2tec/watchtower
+    # container_name: watchtower
+    hostname: watchtower
+    command: --schedule "0 0 4 * * *" --cleanup
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=false
+    # networks:
+    #   external:
+
+  dozzle:
+    # Dozzle - Real-time Docker Log Viewer
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    ports:
+      - 9946:8080
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running"
+      # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dozzle.rule=Host("dozzle.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.dozzle-logs.rule=Host("logs.${LOCAL_DOMAIN_NAME}")
+
+  pihole:
+    image: pihole/pihole
+    restart: unless-stopped
+    # ports:
+    #   - "53:53/tcp"
+    #   - "53:53/udp"
+    #   - "67:67/udp"
+    #   - "80:80/tcp"
+    #   - "443:443/tcp"
+    environment:
+      - TZ=${TZ}
+      # - WEBPASSWORD=${PIHOLE_PASSWORD}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/pihole/etc-pihole/:/etc/pihole/
+      - ${DOCKER_USERDIR}/volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+    networks:
+      unifi:
+        ipv4_address: "192.168.1.194"
+
+
+networks:
+  unifi:
+    external:
+      name: unifi_myvlan

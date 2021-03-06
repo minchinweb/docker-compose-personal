@@ -1,0 +1,35 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  ffsync:
+    # image: mozilla/syncserver:latest
+    # image: local/ffsync
+    build: ../../build/ffsync
+    container_name: ffsync
+    restart: "no"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - SYNCSERVER_PUBLIC_URL=http://ffsync.${LOCAL_DOMAIN_NAME}
+      - SYNCSERVER_SECRET=Z6OCh20wR2jFnWuGkIvWsp3NAJ6Qc1lB
+      - SYNCSERVER_SQLURI=sqlite:////data/syncserver.db
+      - SYNCSERVER_BATCH_UPLOAD_ENABLED=true
+      - SYNCSERVER_FORCE_WSGI_ENVIRON=false
+      - PORT=${FFSYNC_PORT}  # default is 5000
+    ports:
+      - ${FFSYNC_PORT}:${FFSYNC_PORT}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/ffsync:/data
+    labels:
+      - traefik.enable=true
+      - traefik.port=${FFSYNC_PORT}
+      - "traefik.frontend.rule=Host:ffsync.${LOCAL_DOMAIN_NAME}"
+      # - traefik.frontend.entrypoint=http-only
+
+networks:
+  default:
+    external:
+      name: frontend_external

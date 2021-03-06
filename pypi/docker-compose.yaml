@@ -1,0 +1,30 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  pypi:
+    # image: stevearc/pypicloud:1.0.10-py3-alpine
+    # build: ../build/pypicloud
+    image: minchinweb/pypi
+    container_name: pypi
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    ports:
+      - 9920:8080
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/pypi:/config
+    labels:
+      - traefik.enable=true
+      # - traefik.port=8080
+      # - "traefik.frontend.rule=Host:pypi.${LOCAL_DOMAIN_NAME}"  # v1.7
+      # - traefik.frontend.entrypoint=http-only
+      - traefik.http.routers.pypi.rule=Host("pypi.${LOCAL_DOMAIN_NAME}")  # 2.0
+
+networks:
+  default:
+    external:
+      name: frontend_external

@@ -1,0 +1,238 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  # media
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    hostname: qbt
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=022
+      - WEBUI_PORT=${QBT_PORT}
+    hostname: qbittorrent
+    ports:
+      # - 6881:6881
+      # - 6881:6881/udp
+      - 56881:56881
+      - 56881:56881/udp
+      - ${QBT_PORT}:${QBT_PORT}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/qbittorrent/config:/config
+      # - ${DOCKER_USERDIR}/volumes/qbittorrent/downloads:/downloads
+      - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbt.rule=Host("qbt.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.services.qbt.loadbalancer.server.port=${QBT_PORT}  # internal port, when multiple ports are exposed
+    # networks:
+    #   frontend_external:
+
+  deemix:
+    build: ../../build/deemix
+    container_name: deemix
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - ARL=${DEEMIX_ARL}
+    ports:
+      # - 9948:33333
+      - 9949:33333
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/deemix/config:/config
+      - ${DOCKER_EXTRA_DIR}/deemix/downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.deemix.rule=Host("dmix.${LOCAL_DOMAIN_NAME}")
+
+  calibre-web:
+    # best calibre web reading
+
+    # this is *just* the web interface from Calibre
+    # with the Docker Mod, it pulls and installs a bunch of stuff from
+    # `apt`, so it takes a while to start up
+    image: linuxserver/calibre-web
+    container_name: calibre-web
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/calibre-web:calibre
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/calibre-web/config:/config
+      - ${NAS_DIR}/ebook/calibre:/books:ro
+    ports:
+      - 9936:8083
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      # - traefik.http.routers.calibreweb2.rule=Host("${LOCAL_DOMAIN_NAME}") && PathPrefix("/books")
+      - traefik.http.routers.calibreweb.rule=Host("books.${LOCAL_DOMAIN_NAME}")
+    # networks:
+    #   external:
+
+  cops:
+    # best OPDS feed for calibre
+    
+    # provides a web interface and OPDS feed for calibre
+    image: linuxserver/cops
+    container_name: cops
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/cops/config:/config
+      - ${NAS_DIR}/ebook/calibre:/books:ro
+    ports:
+      - 9938:80
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cops.rule=Host("cops.${LOCAL_DOMAIN_NAME}")
+
+  # c.f. https://hub.docker.com/r/linuxserver/calibre
+
+  # ubooquity:
+  #   image: linuxserver/ubooquity
+  #   container_name: ubooquity
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     # - MAXMEM=maxmem  # runs on Java, max memory in MB
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/ubooquity/config:/config
+  #     - ${NAS_DIR}/ebook/calibre:/books:ro
+  #     # - path to comics:/comics
+  #     # - path to raw files:/files
+  #   ports:
+  #     - 9940:2202
+  #     - 9941:2203  # admin port
+  #   restart: unless-stopped
+
+  # bicbucstriim:
+  #   # this relies on Calibre as well
+  #   image: undergrid/bicbucstriim
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DOCKER_USERDIR}/volumes/bicbucstriim/config:/config
+  #     - ${NAS_DIR}/ebook/calibre:/books:ro
+  #   ports:
+  #     - 9942:80
+  #     - 9943:443
+
+  audioserve:
+    # Audiobook server, Folder (not tag) based
+    # https://github.com/izderadicka/audioserve
+    image: izderadicka/audioserve
+    command:
+      # - --no-authentication
+      - /audiobooks  # directory with audiobooks in it; multiple can be listed
+    environment:
+      - PUID=${PUID}  # useful?
+      - PGID=${PGID}  # useful?
+      - TZ=${TZ}      # useful?
+      - AUDIOSERVE_SHARED_SECRET=${AUDIOSERVE_SHARED_SECRET}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/audioserve:/home/audioserve/.audioserve
+      - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
+    ports:
+      - 9944:3000
+    # restart: unless-stopped
+    labels:
+      - traefik.enable=true
+
+      - traefik.http.routers.audioserve.rule=Host("ab.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.audioserve.entrypoints=web
+      # - traefik.http.routers.audioserve.middlewares=audioserve-to-https
+
+      - traefik.http.routers.audioservesecure.rule=Host("ab.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.audioservesecure.entrypoints=websecure
+      - traefik.http.routers.audioservesecure.tls=true
+      # - traefik.http.routers.audioservesecure.tls.certresolver=myresolver
+      
+      # - traefik.http.middlewares.audioserve-to-https.redirectscheme.scheme=https
+      # - traefik.http.middlewares.audioserve-to-https.redirectscheme.permanent=true
+
+      - traefik.http.routers.audioserve-public.rule=Host("ab.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.audioserve-public.entrypoints=web
+      - traefik.http.routers.audioserve-public.middlewares=audioserve-public-to-https
+
+      - traefik.http.routers.audioserve-publicsecure.rule=Host("ab.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.audioserve-publicsecure.entrypoints=websecure
+      - traefik.http.routers.audioserve-publicsecure.tls=true
+      - traefik.http.routers.audioserve-publicsecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.permanent=true
+
+  # works, but uses 650MB of RAM at rest
+  # booksonic-air:
+  #   image: linuxserver/booksonic-air
+  #   container_name: booksonic-air
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     # - CONTEXT_PATH=url-base
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/booksonic-air:/config
+  #     - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
+  #     # - /path/to/podcasts:/podcasts
+  #     # - /path/to/othermedia:/othermedia
+  #   ports:
+  #     - 9954:4040
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.booksonic-air.rule=Host("booksonic.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.booksonic-air.entrypoints=web
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: ${PUID}:${PGID}  # should be owner of volumes
+    ports:
+      - 9956:4533
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      # Optional: put your config options customization here. Examples:
+      - ND_SCANINTERVAL=15m
+      - ND_LOGLEVEL=info  
+      - ND_SESSIONTIMEOUT=24h
+      - ND_BASEURL=/
+      # exposing transcoding is a security risk
+      # - ND_ENABLETRANSCODINGCONFIG=true
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/navidrome:/data
+      - ${NAS_DIR}/music/Music:/music:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.navidrome.rule=Host("music.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.navidrome.entrypoints=web
+
+  # jellyfin -- media server to compliment Kodi
+  # https://hub.docker.com/r/linuxserver/jellyfin
+
+  # PhotoPrism -- photo sorter with face and subject recongition
+  # suggests minimum 2 cores and 4GB of memory
+  # https://github.com/photoprism/photoprism
+
+networks:
+  default:
+    external:
+      name: frontend_external

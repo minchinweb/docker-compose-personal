@@ -1,0 +1,30 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+
+  bedrock:
+    image: itzg/minecraft-bedrock-server
+    restart: unless-stopped
+    environment:
+      - EULA=TRUE
+      - VERSION=${MINECRAFT_VERSION}
+      - UID=${PUID}
+      - GID=${PGID}
+      - GAMEMODE=survival
+      - DIFFICULTY=peaceful
+      - SERVER_NAME=Normandie
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/minecraft:/data
+    ports:
+      - 19132:19132/udp
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minecraft.rule=Host("minecraft.${LOCAL_DOMAIN_NAME}")
+
+networks:
+  default:
+    external:
+      name: frontend_external
