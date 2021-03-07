@@ -6,7 +6,7 @@ version: '2.4'
 services:
   # meta
   traefik:
-    image: traefik:2.3
+    image: traefik:2.4
     command:
       # - --configFile=/config/traefik.old.toml
       # - --accessLog.filePath=/var/log/access.log
@@ -94,17 +94,17 @@ services:
       
       # declare both the HTTP and HTTPS versions, and then a middleware
       # that redirects HTTP --> HTTPS
-      - traefik.http.routers.landingpage.rule=Host("${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.landingpage.entrypoints=web
-      - traefik.http.routers.landingpage.middlewares=landingpage-to-https
-
-      - traefik.http.routers.landingpagesecure.rule=Host("${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.landingpagesecure.entrypoints=websecure
-      - traefik.http.routers.landingpagesecure.tls=true
-      - traefik.http.routers.landingpagesecure.tls.certresolver=myresolver
-      
-      - traefik.http.middlewares.landingpage-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.landingpage-to-https.redirectscheme.permanent=true
+      # - traefik.http.routers.landingpage.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      # - traefik.http.routers.landingpage.entrypoints=web
+      # - traefik.http.routers.landingpage.middlewares=landingpage-to-https
+      #
+      # - traefik.http.routers.landingpagesecure.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      # - traefik.http.routers.landingpagesecure.entrypoints=websecure
+      # - traefik.http.routers.landingpagesecure.tls=true
+      # - traefik.http.routers.landingpagesecure.tls.certresolver=myresolver
+      #
+      # - traefik.http.middlewares.landingpage-to-https.redirectscheme.scheme=https
+      # - traefik.http.middlewares.landingpage-to-https.redirectscheme.permanent=true
 
       - traefik.http.routers.landingpageinternal.rule=Host("${LOCAL_DOMAIN_NAME}")
 
