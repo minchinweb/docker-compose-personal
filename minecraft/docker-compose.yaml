@@ -5,7 +5,7 @@ version: '2.4'
 
 services:
 
-  bedrock:
+  bedrock_peaceful:
     image: itzg/minecraft-bedrock-server
     restart: unless-stopped
     environment:
@@ -16,6 +16,9 @@ services:
       - GAMEMODE=survival
       - DIFFICULTY=peaceful
       - SERVER_NAME=Normandie
+      - VIEW_DISTANCE=72
+      - MAX_THREADS=8
+      - LEVEL_NAME=Minchin Family
     volumes:
       - ${DOCKER_USERDIR}/volumes/minecraft:/data
     ports:
@@ -23,6 +26,29 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.minecraft.rule=Host("minecraft.${LOCAL_DOMAIN_NAME}")
+
+  bedrock_survival:
+    image: itzg/minecraft-bedrock-server
+    restart: unless-stopped
+    environment:
+      - EULA=TRUE
+      # - VERSION=${MINECRAFT_VERSION}
+      - UID=${PUID}
+      - GID=${PGID}
+      - GAMEMODE=survival
+      - DIFFICULTY=normal
+      - SERVER_NAME=Normandie Survival
+      - SERVER_PORT=19134
+      - VIEW_DISTANCE=72
+      - MAX_THREADS=8
+      - LEVEL_NAME=Minchin Family Survival
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/minecraft-survival:/data
+    ports:
+      - 19134:19134/udp
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minecraft-survival.rule=Host("minecraft-survival.${LOCAL_DOMAIN_NAME}")
 
 networks:
   default:
