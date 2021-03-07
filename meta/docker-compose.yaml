@@ -65,27 +65,30 @@ services:
       - traefik.http.routers.dozzle.rule=Host("dozzle.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.dozzle-logs.rule=Host("logs.${LOCAL_DOMAIN_NAME}")
 
-  pihole:
-    image: pihole/pihole
-    restart: unless-stopped
-    # ports:
-    #   - "53:53/tcp"
-    #   - "53:53/udp"
-    #   - "67:67/udp"
-    #   - "80:80/tcp"
-    #   - "443:443/tcp"
-    environment:
-      - TZ=${TZ}
-      # - WEBPASSWORD=${PIHOLE_PASSWORD}
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/pihole/etc-pihole/:/etc/pihole/
-      - ${DOCKER_USERDIR}/volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
-    networks:
-      unifi:
-        ipv4_address: "192.168.1.194"
+  # pihole:
+  #   image: pihole/pihole
+  #   restart: unless-stopped
+  #   # ports:
+  #   #   - "53:53/tcp"
+  #   #   - "53:53/udp"
+  #   #   - "67:67/udp"
+  #   #   - "80:80/tcp"
+  #   #   - "443:443/tcp"
+  #   environment:
+  #     - TZ=${TZ}
+  #     # - WEBPASSWORD=${PIHOLE_PASSWORD}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/pihole/etc-pihole/:/etc/pihole/
+  #     - ${DOCKER_USERDIR}/volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+  #   networks:
+  #     unifi:
+  #       ipv4_address: "192.168.1.194"
 
 
 networks:
-  unifi:
+  default:
     external:
-      name: unifi_myvlan
+      name: frontend_external
+  # unifi:
+  #   external:
+  #     name: unifi_myvlan
