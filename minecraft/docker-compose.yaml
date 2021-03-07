@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
     environment:
       - EULA=TRUE
-      - VERSION=${MINECRAFT_VERSION}
+      # - VERSION=${MINECRAFT_VERSION}
       - UID=${PUID}
       - GID=${PGID}
       - GAMEMODE=survival
