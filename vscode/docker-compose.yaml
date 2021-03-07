@@ -5,37 +5,7 @@ version: '2.4'
 
 services:
 
-  # vscode:
-  #   image: codercom/code-server:1.1156-vsc1.33.1
-  #   # https://github.com/codercom/code-server
-  #   # version 2 is out, but I can't (quickly) find a sample docker-compose file
-  #   restart: unless-stopped
-  #   # command:
-  #   #   - --password ${VSCODE_PASSWORD}
-  #   #   - --no-auth
-  #   #   - --cert=/shared/certs/traefik.crt
-  #   #   - --cert-key=/shared/certs/traefik.key
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - PASSWORD=${VSCODE_PASSWORD}
-  #   volumes:
-  #     - ${DOCKER_USERDIR}/sorbonne:/home/coder/sorbonne
-  #     - ${DOCKER_USERDIR}/build:/home/coder/builders
-  #     - ${DOCKER_USERDIR}/compose:/home/coder/compose
-  #     # - ${DOCKER_USERDIR}/volumes:/home/coder/docker
-  #     - ${DOCKER_USERDIR}/volumes/homeassistant:/home/coder/volumes/homeassistant
-  #     - ${DOCKER_USERDIR}/volumes/traefik:/home/coder/volumes/traefik
-  #     - ${DOCKER_USERDIR}/volumes/code-server:/home/coder/.local/share/code-server
-  #     - ${DOCKER_USERDIR}/volumes/unifi/data/sites/default:/home/coder/volumes/unifi
-  #     # - ${DOCKER_USERDIR}/volumes/shared:/shared
-  #   ports:
-  #     - 9911:8443
-  #   labels:
-  #     # doesn't work as either a subdomain or a folder with traefik
-  #     - traefik.enable=false
-
-  vscodo-lsio:
+  vscode:
     image: linuxserver/code-server
     container_name: vscode
     restart: unless-stopped
@@ -75,7 +45,6 @@ services:
       
       - traefik.http.middlewares.vscode-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.vscode-to-https.redirectscheme.permanent=true
-
 
 networks:
   default:
