@@ -1,0 +1,42 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  starbound:
+    build: ../../build/starbound
+    # container_name: starbound
+    # restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/starbound-app:/app:ro
+      - ${DOCKER_USERDIR}/volumes/starbound-config:/config
+    ports:
+      - 21025:21025
+    labels:
+      - traefik.enable=false
+
+  starbound-fu:
+    build: ../../build/starbound
+    # container_name: starbound_fu
+    # restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/starbound-app:/app:ro
+      - ${DOCKER_USERDIR}/volumes/starbound-fu-config:/config
+    ports:
+      - 21030:21025
+    labels:
+      - traefik.enable=false
+
+networks:
+  default:
+    external:
+      name: frontend_external
