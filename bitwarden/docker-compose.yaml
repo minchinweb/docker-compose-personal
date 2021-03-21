@@ -1,0 +1,56 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+# https://github.com/dani-garcia/bitwarden_rs/wiki/Enabling-HTTPS
+# https://github.com/dani-garcia/bitwarden_rs/wiki/Using-the-MariaDB-%28MySQL%29-Backend
+# defaults to includes SQLite, but can run on Maria DB
+
+
+services:
+
+  bitwarden:
+    image: bitwardenrs/server:latest
+    # container_name: bitwarden
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/bitwarden_rs:/data
+    ports:
+      - 9962:80
+    labels:
+      # - traefik.enable=false
+      - traefik.enable=true
+      - traefik.http.routers.bitwarden-local.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.bitwarden-local.entrypoints=web
+      - traefik.http.routers.bitwarden-local.middlewares=bitwarden-to-https
+
+      - traefik.http.routers.bitwarden-local-secure.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.bitwarden-local-secure.entrypoints=websecure
+      - traefik.http.routers.bitwarden-local-secure.tls=true
+      # - traefik.http.routers.bitwarden-local-secure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.permanent=true
+
+
+      - traefik.http.routers.bitwarden.rule=Host("vault.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.bitwarden.entrypoints=web
+      - traefik.http.routers.bitwarden.middlewares=bitwarden-to-https
+
+      - traefik.http.routers.bitwarden-secure.rule=Host("vault.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.bitwarden-secure.entrypoints=websecure
+      - traefik.http.routers.bitwarden-secure.tls=true
+      - traefik.http.routers.bitwarden-secure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.bitwarden-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.bitwarden-to-https.redirectscheme.permanent=true
+
+networks:
+  default:
+    external:
+      name: frontend_external
