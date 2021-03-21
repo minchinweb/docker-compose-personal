@@ -90,23 +90,23 @@ services:
       external:
     labels:
       - traefik.enable=true
-      # - traefik.http.routers.landingpage.rule=Host("${LOCAL_DOMAIN_NAME}") || Host("${PUBLIC_DOMAIN_NAME}")
+      # - traefik.http.routers.landing-page.rule=Host("${LOCAL_DOMAIN_NAME}") || Host("${PUBLIC_DOMAIN_NAME}")
       
       # declare both the HTTP and HTTPS versions, and then a middleware
       # that redirects HTTP --> HTTPS
-      # - traefik.http.routers.landingpage.rule=Host("${PUBLIC_DOMAIN_NAME}")
-      # - traefik.http.routers.landingpage.entrypoints=web
-      # - traefik.http.routers.landingpage.middlewares=landingpage-to-https
-      #
-      # - traefik.http.routers.landingpagesecure.rule=Host("${PUBLIC_DOMAIN_NAME}")
-      # - traefik.http.routers.landingpagesecure.entrypoints=websecure
-      # - traefik.http.routers.landingpagesecure.tls=true
-      # - traefik.http.routers.landingpagesecure.tls.certresolver=myresolver
-      #
-      # - traefik.http.middlewares.landingpage-to-https.redirectscheme.scheme=https
-      # - traefik.http.middlewares.landingpage-to-https.redirectscheme.permanent=true
+      - traefik.http.routers.landing-page.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.landing-page.entrypoints=web
+      - traefik.http.routers.landing-page.middlewares=landing-page-to-https
+      
+      - traefik.http.routers.landing-page-secure.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.landing-page-secure.entrypoints=websecure
+      - traefik.http.routers.landing-page-secure.tls=true
+      - traefik.http.routers.landing-page-secure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.landing-page-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.landing-page-to-https.redirectscheme.permanent=true
 
-      - traefik.http.routers.landingpageinternal.rule=Host("${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.landing-page-internal.rule=Host("${LOCAL_DOMAIN_NAME}")
 
 networks:
   external:
