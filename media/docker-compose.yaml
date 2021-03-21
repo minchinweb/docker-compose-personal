@@ -13,7 +13,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - UMASK_SET=022
+      - UMASK=022
       - WEBUI_PORT=${QBT_PORT}
     hostname: qbittorrent
     ports:
