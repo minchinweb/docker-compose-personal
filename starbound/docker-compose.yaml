@@ -7,7 +7,7 @@ services:
   starbound:
     build: ../../build/starbound
     # container_name: starbound
-    # restart: unless-stopped
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -23,7 +23,7 @@ services:
   starbound-fu:
     build: ../../build/starbound
     # container_name: starbound_fu
-    # restart: unless-stopped
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
