@@ -87,6 +87,22 @@ services:
 
 
 
+  ddns:
+    # build: ../../build/ddns
+    image: minchinweb/ddns
+    container_name: ddns_vault.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=vault.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_VAULT}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+
 networks:
   default:
     external:

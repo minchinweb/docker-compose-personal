@@ -28,6 +28,7 @@ services:
       - --accesslog.filters.minduration=10ms
       - --accesslog.filters.retryattempts
       - --accesslog.filepath=/var/log/access.log
+      # - --log.level=DEBUG
       # TODO: push stats to InfluxDB
     hostname: traefik
     container_name: traefik
