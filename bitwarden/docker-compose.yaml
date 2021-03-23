@@ -10,21 +10,28 @@ version: '2.4'
 
 services:
 
+  # DDNS is done under the 'ddns' stack
+
   bitwarden:
     image: bitwardenrs/server:latest
     # container_name: bitwarden
     restart: unless-stopped
+    user: ${PUID}:${PGID}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
       - TZ=${TZ}
+      - ROCKET_PORT=8080
     volumes:
       - ${DOCKER_USERDIR}/volumes/bitwarden_rs:/data
     ports:
-      - 9962:80
+      - 9962:8080
     labels:
       # - traefik.enable=false
       - traefik.enable=true
+      # specify internal port
+      - traefik.http.services.bitwarden-service.loadbalancer.server.port=8080
+      - traefik.http.routers.bitwarden-local.service=bitwarden-service
+      - traefik.http.routers.bitwarden.service=bitwarden-service
+
       - traefik.http.routers.bitwarden-local.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.bitwarden-local.entrypoints=web
       - traefik.http.routers.bitwarden-local.middlewares=bitwarden-to-https
