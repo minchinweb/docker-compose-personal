@@ -5,7 +5,8 @@ version: '2.4'
 
 services:
   ddns-base:
-    build: ../../build/ddns  # also at minchinweb/ddns:latest
+    # build: ../../build/ddns  # also at minchinweb/ddns:latest
+    image: minchinweb/ddns
     container_name: ddns_${PUBLIC_DOMAIN_NAME}
     restart: unless-stopped
     environment:
@@ -21,7 +22,8 @@ services:
 
   ddns-audioserve:
     # for audioserve
-    build: ../../build/ddns
+    # build: ../../build/ddns
+    image: minchinweb/ddns
     container_name: ddns_ab.${PUBLIC_DOMAIN_NAME}
     restart: unless-stopped
     environment:
@@ -34,6 +36,59 @@ services:
       - /etc/localtime:/etc/localtime:ro
     labels:
       - traefik.enable=false
+
+
+  ddns-bitwarden:
+    # build: ../../build/ddns
+    image: minchinweb/ddns
+    container_name: ddns_vault.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=vault.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_VAULT}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+
+
+  ddns-booksonic:
+    # for booksonic-air
+    # build: ../../build/ddns
+    image: minchinweb/ddns
+    container_name: ddns_booksonic.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=booksonic.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_BOOKSONIC}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+
+  ddns-navidrome:
+    # for Navidrom
+    # build: ../../build/ddns
+    image: minchinweb/ddns
+    container_name: ddns_music.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=music.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_MUSIC}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+    
 
 
 networks:

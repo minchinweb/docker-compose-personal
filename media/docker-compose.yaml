@@ -175,72 +175,84 @@ services:
   #     - 9942:80
   #     - 9943:443
 
-  audioserve:
-    # Audiobook server, Folder (not tag) based
-    # https://github.com/izderadicka/audioserve
-    image: izderadicka/audioserve
-    command:
-      # - --no-authentication
-      - /audiobooks  # directory with audiobooks in it; multiple can be listed
-    environment:
-      - PUID=${PUID}  # useful?
-      - PGID=${PGID}  # useful?
-      - TZ=${TZ}      # useful?
-      - AUDIOSERVE_SHARED_SECRET=${AUDIOSERVE_SHARED_SECRET}
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/audioserve:/home/audioserve/.audioserve
-      - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
-    ports:
-      - 9944:3000
-    # restart: unless-stopped
-    labels:
-      - traefik.enable=true
-
-      - traefik.http.routers.audioserve.rule=Host("ab.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.audioserve.entrypoints=web
-      # - traefik.http.routers.audioserve.middlewares=audioserve-to-https
-
-      - traefik.http.routers.audioservesecure.rule=Host("ab.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.audioservesecure.entrypoints=websecure
-      - traefik.http.routers.audioservesecure.tls=true
-      # - traefik.http.routers.audioservesecure.tls.certresolver=myresolver
-      
-      # - traefik.http.middlewares.audioserve-to-https.redirectscheme.scheme=https
-      # - traefik.http.middlewares.audioserve-to-https.redirectscheme.permanent=true
-
-      - traefik.http.routers.audioserve-public.rule=Host("ab.${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.audioserve-public.entrypoints=web
-      - traefik.http.routers.audioserve-public.middlewares=audioserve-public-to-https
-
-      - traefik.http.routers.audioserve-publicsecure.rule=Host("ab.${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.audioserve-publicsecure.entrypoints=websecure
-      - traefik.http.routers.audioserve-publicsecure.tls=true
-      - traefik.http.routers.audioserve-publicsecure.tls.certresolver=myresolver
-      
-      - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.permanent=true
-
-  # works, but uses 650MB of RAM at rest
-  # booksonic-air:
-  #   image: linuxserver/booksonic-air
-  #   container_name: booksonic-air
+  # audioserve:
+  #   # Audiobook server, Folder (not tag) based
+  #   # https://github.com/izderadicka/audioserve
+  #   image: izderadicka/audioserve
+  #   command:
+  #     # - --no-authentication
+  #     - /audiobooks  # directory with audiobooks in it; multiple can be listed
   #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #     # - CONTEXT_PATH=url-base
+  #     - PUID=${PUID}  # useful?
+  #     - PGID=${PGID}  # useful?
+  #     - TZ=${TZ}      # useful?
+  #     - AUDIOSERVE_SHARED_SECRET=${AUDIOSERVE_SHARED_SECRET}
   #   volumes:
-  #     - ${DOCKER_USERDIR}/volumes/booksonic-air:/config
+  #     - ${DOCKER_USERDIR}/volumes/audioserve:/home/audioserve/.audioserve
   #     - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
-  #     # - /path/to/podcasts:/podcasts
-  #     # - /path/to/othermedia:/othermedia
   #   ports:
-  #     - 9954:4040
-  #   restart: unless-stopped
+  #     - 9944:3000
+  #   # restart: unless-stopped
   #   labels:
   #     - traefik.enable=true
-  #     - traefik.http.routers.booksonic-air.rule=Host("booksonic.${LOCAL_DOMAIN_NAME}")
-  #     - traefik.http.routers.booksonic-air.entrypoints=web
+
+  #     - traefik.http.routers.audioserve.rule=Host("ab.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.audioserve.entrypoints=web
+  #     # - traefik.http.routers.audioserve.middlewares=audioserve-to-https
+
+  #     - traefik.http.routers.audioservesecure.rule=Host("ab.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.audioservesecure.entrypoints=websecure
+  #     - traefik.http.routers.audioservesecure.tls=true
+  #     # - traefik.http.routers.audioservesecure.tls.certresolver=myresolver
+      
+  #     # - traefik.http.middlewares.audioserve-to-https.redirectscheme.scheme=https
+  #     # - traefik.http.middlewares.audioserve-to-https.redirectscheme.permanent=true
+
+  #     - traefik.http.routers.audioserve-public.rule=Host("ab.${PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.audioserve-public.entrypoints=web
+  #     - traefik.http.routers.audioserve-public.middlewares=audioserve-public-to-https
+
+  #     - traefik.http.routers.audioserve-publicsecure.rule=Host("ab.${PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.audioserve-publicsecure.entrypoints=websecure
+  #     - traefik.http.routers.audioserve-publicsecure.tls=true
+  #     - traefik.http.routers.audioserve-publicsecure.tls.certresolver=myresolver
+      
+  #     - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.scheme=https
+  #     - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.permanent=true
+
+  # works, but uses 650MB of RAM at rest
+  booksonic-air:
+    image: ghcr.io/linuxserver/booksonic-air
+    container_name: booksonic-air
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      # - CONTEXT_PATH=url-base
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/booksonic-air:/config
+      - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
+      # - /path/to/podcasts:/podcasts
+      # - /path/to/othermedia:/othermedia
+    ports:
+      - 9954:4040
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.booksonicair.rule=Host("booksonic.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.booksonicair.entrypoints=web
+
+      - traefik.http.routers.booksonicair-public.rule=Host("booksonic.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.booksonicair-public.entrypoints=web
+      - traefik.http.routers.booksonicair-public.middlewares=booksonicair-public-to-https
+
+      - traefik.http.routers.booksonicair-publicsecure.rule=Host("booksonic.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.booksonicair-publicsecure.entrypoints=websecure
+      - traefik.http.routers.booksonicair-publicsecure.tls=true
+      - traefik.http.routers.booksonicair-publicsecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.permanent=true
 
   navidrome:
     image: deluan/navidrome:latest
@@ -266,6 +278,18 @@ services:
       - traefik.enable=true
       - traefik.http.routers.navidrome.rule=Host("music.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.navidrome.entrypoints=web
+
+      - traefik.http.routers.navidrome-public.rule=Host("music.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.navidrome-public.entrypoints=web
+      - traefik.http.routers.navidrome-public.middlewares=navidrome-public-to-https
+
+      - traefik.http.routers.navidrome-publicsecure.rule=Host("music.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.navidrome-publicsecure.entrypoints=websecure
+      - traefik.http.routers.navidrome-publicsecure.tls=true
+      - traefik.http.routers.navidrome-publicsecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.navidrome-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.navidrome-public-to-https.redirectscheme.permanent=true
 
   # jellyfin -- media server to compliment Kodi
   # https://hub.docker.com/r/linuxserver/jellyfin
