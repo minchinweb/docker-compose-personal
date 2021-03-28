@@ -6,7 +6,7 @@ version: '2.4'
 services:
   # media
   qbittorrent:
-    image: linuxserver/qbittorrent
+    image: ghcr.io/linuxserver/qbittorrent
     container_name: qbittorrent
     hostname: qbt
     environment:
@@ -23,34 +23,76 @@ services:
       - 56881:56881/udp
       - ${QBT_PORT}:${QBT_PORT}
     volumes:
-      - ${DOCKER_USERDIR}/volumes/qbittorrent/config:/config
-      # - ${DOCKER_USERDIR}/volumes/qbittorrent/downloads:/downloads
-      - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads
+      - ${DOCKER_USERDIR}/volumes/qbittorrent/:/config
+      # - ${DOCKER_USERDIR}/volumes/qbittorrent-downloads:/downloads
+      - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive
+      - ${DOCKER_EXTRA_DIR_2}/qbittorrent/more-downloads:/mnt/d  # 'D' drive
     restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbt.rule=Host("qbt.${LOCAL_DOMAIN_NAME}")
       - traefik.http.services.qbt.loadbalancer.server.port=${QBT_PORT}  # internal port, when multiple ports are exposed
-    # networks:
-    #   frontend_external:
 
-  deemix:
-    build: ../../build/deemix
+  # rutorrent:
+  #   image: ghcr.io/linuxserver/rutorrent
+  #   container_name: rutorrent
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/rutorrent:/config
+  #     - ${DOCKER_EXTRA_DIR}/rutorrent/downloads:/downloads
+  #     - ${DOCKER_EXTRA_DIR_2}/rutorrent/more-downloads:/mnt/d
+  #     - ${DOCKER_USERDIR}/volumes/qbittorrent:/mnt/qbittorrent/config:ro
+  #     - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/mnt/qbittorrent/downloads:ro
+  #   ports:
+  #     - 9966:80
+  #     - 5000:5000
+  #     - 51413:51413
+  #     - 6881:6881/udp
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.rutorrent.rule=Host("rutorrent.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.services.rutorrent.loadbalancer.server.port=80
+
+  # deemix-build:
+  #   build: ../../build/deemix
+  #   container_name: deemix
+  #   restart: unless-stopped
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - ARL=${DEEMIX_ARL}
+  #   ports:
+  #     # - 9948:33333
+  #     - 9949:33333
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/deemix/config:/config
+  #     - ${DOCKER_EXTRA_DIR}/deemix/downloads:/downloads
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.deemix.rule=Host("dmix.${LOCAL_DOMAIN_NAME}")
+
+  deemix-bockiii:
+    # https://gitlab.com/Bockiii/deemix-docker
+    image: registry.gitlab.com/bockiii/deemix-docker
     container_name: deemix
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - ARL=${DEEMIX_ARL}
+      # - ARL="${DEEMIX_ARL}"
+      - UMASK_SET=022
+      - DEEZUI=false
     ports:
-      # - 9948:33333
-      - 9949:33333
+      - 9948:6595
     volumes:
-      - ${DOCKER_USERDIR}/volumes/deemix/config:/config
-      - ${DOCKER_EXTRA_DIR}/deemix/downloads:/downloads
+      - ${DOCKER_USERDIR}/volumes/deemix-bockiii:/config
+      - ${DOCKER_EXTRA_DIR}/deemix/downloads-2:/downloads
     labels:
       - traefik.enable=true
       - traefik.http.routers.deemix.rule=Host("dmix.${LOCAL_DOMAIN_NAME}")
+
 
   calibre-web:
     # best calibre web reading
@@ -58,7 +100,7 @@ services:
     # this is *just* the web interface from Calibre
     # with the Docker Mod, it pulls and installs a bunch of stuff from
     # `apt`, so it takes a while to start up
-    image: linuxserver/calibre-web
+    image: ghcr.io/linuxserver/calibre-web
     container_name: calibre-web
     environment:
       - PUID=${PUID}
@@ -82,14 +124,14 @@ services:
     # best OPDS feed for calibre
     
     # provides a web interface and OPDS feed for calibre
-    image: linuxserver/cops
+    image: ghcr.io/linuxserver/cops
     container_name: cops
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${DOCKER_USERDIR}/volumes/cops/config:/config
+      - ${DOCKER_USERDIR}/volumes/cops:/config
       - ${NAS_DIR}/ebook/calibre:/books:ro
     ports:
       - 9938:80

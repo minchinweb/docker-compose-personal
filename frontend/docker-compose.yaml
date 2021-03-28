@@ -45,7 +45,6 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      # - traefik.port=8080  # internal container port
       - traefik.docker.network=frontend_external
       # - traefik.docker.domain=${LOCAL_DOMAIN_NAME}
       # - traefik.docker.exposedByDefault=false
