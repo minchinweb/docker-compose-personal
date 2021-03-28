@@ -117,10 +117,29 @@ services:
       - /dev/sdb:/dev/sdb
       - /dev/sdc:/dev/sdc
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.scrutiny.rule=Host("scrutiny.${LOCAL_DOMAIN_NAME}") 
 
     # You may need to manually enter the container to run 
     # `scrutiny-collector-metrics run` for your first job or wait
     # until around midnight for it to kick off.
+
+  qdirstat:
+    image: jlesage/qdirstat
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/qdirstat:/config
+      - /:/storage:ro
+    ports:
+      - 9970:5800
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.scrutiny.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}") 
 
 
 
