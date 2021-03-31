@@ -145,8 +145,14 @@ services:
 
 networks:
   default:
-    external:
-      name: frontend_external
-  # unifi:
-  #   external:
-  #     name: unifi_myvlan
+    name: meta_external
+  vlan:
+    driver: macvlan
+    driver_opts:
+      parent: enp0s25
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
+          # 192.168.1.192 to 192.168.1.223
+          ip_range: 192.168.1.192/27

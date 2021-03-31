@@ -26,4 +26,4 @@ services:
 networks:
   default:
     external:
-      name: frontend_external
+      name: meta_external

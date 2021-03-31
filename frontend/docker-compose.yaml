@@ -45,7 +45,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.docker.network=frontend_external
+      - traefik.docker.network=meta_external
       # - traefik.docker.domain=${LOCAL_DOMAIN_NAME}
       # - traefik.docker.exposedByDefault=false
       # - traefik.docker.watch=true
@@ -57,8 +57,6 @@ services:
 
       ## HTTP --> HTTPS redirect
       # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-    networks:
-      external:
               
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -86,8 +84,6 @@ services:
       # - /etc/localtime:/etc/localtime:ro  # doesn't make a difference
     ports:
       - 9918:8080
-    networks:
-      external:
     labels:
       - traefik.enable=true
       # - traefik.http.routers.landing-page.rule=Host("${LOCAL_DOMAIN_NAME}") || Host("${PUBLIC_DOMAIN_NAME}")
@@ -109,5 +105,6 @@ services:
       - traefik.http.routers.landing-page-internal.rule=Host("${LOCAL_DOMAIN_NAME}")
 
 networks:
-  external:
-
+  default:
+    external:
+      name: meta_external

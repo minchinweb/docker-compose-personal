@@ -5,8 +5,9 @@ version: '2.4'
 
 # mods are shared on the network using Samba (on the host)
 
+# Starbound
 services:
-  starbound:
+  vanilla:
     build: ../../build/starbound
     # container_name: starbound
     restart: unless-stopped
@@ -22,7 +23,7 @@ services:
     labels:
       - traefik.enable=false
 
-  starbound-fu:
+  frackin-universe:
     build: ../../build/starbound
     # container_name: starbound_fu
     restart: unless-stopped
@@ -41,4 +42,4 @@ services:
 networks:
   default:
     external:
-      name: frontend_external
+      name: meta_external

@@ -50,13 +50,9 @@ services:
     #   - traefik.http.middlewares.unifi-to-https.redirectscheme.permanent=true
 
 networks:
+  default:
+    external:
+      name: meta_external
   myvlan:
-    driver: macvlan
-    driver_opts:
-      parent: enp1s10
-    ipam:
-      config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.1
-          # 192.168.1.192 to 192.168.1.223
-          ip_range: 192.168.1.192/27
+    external:
+      name: meta_vlan
