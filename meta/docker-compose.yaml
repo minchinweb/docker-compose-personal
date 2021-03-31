@@ -26,6 +26,7 @@ services:
       - traefik.enable=true
       # doesn't seem to work on path; never connects to Docker deamon
       - traefik.http.routers.portainer.rule=Host("portainer.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.services.portainer-service.loadbalancer.server.port=9000
 
       # docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
 
@@ -49,7 +50,7 @@ services:
   dozzle:
     # Dozzle - Real-time Docker Log Viewer
     image: amir20/dozzle:latest
-    container_name: dozzle
+    # container_name: dozzle
     restart: unless-stopped
     ports:
       - 9946:8080
@@ -65,24 +66,31 @@ services:
       - traefik.http.routers.dozzle.rule=Host("dozzle.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.dozzle-logs.rule=Host("logs.${LOCAL_DOMAIN_NAME}")
 
-  # pihole:
-  #   image: pihole/pihole
-  #   restart: unless-stopped
-  #   # ports:
-  #   #   - "53:53/tcp"
-  #   #   - "53:53/udp"
-  #   #   - "67:67/udp"
-  #   #   - "80:80/tcp"
-  #   #   - "443:443/tcp"
-  #   environment:
-  #     - TZ=${TZ}
-  #     # - WEBPASSWORD=${PIHOLE_PASSWORD}
-  #   volumes:
-  #     - ${DOCKER_USERDIR}/volumes/pihole/etc-pihole/:/etc/pihole/
-  #     - ${DOCKER_USERDIR}/volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
-  #   networks:
-  #     unifi:
-  #       ipv4_address: "192.168.1.194"
+  pihole:
+    image: pihole/pihole
+    restart: unless-stopped
+    # ports:
+    #   - "53:53/tcp"
+    #   - "53:53/udp"
+    #   - "67:67/udp"
+    #   - "80:80/tcp"
+    #   - "443:443/tcp"
+    environment:
+      - TZ=${TZ}
+      # - WEBPASSWORD=${PIHOLE_PASSWORD}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/pihole/etc-pihole/:/etc/pihole/
+      - ${DOCKER_USERDIR}/volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+    networks:
+      # list both networks. The `vlan` allows it to be usable as a DNS server, while the
+      # `default` network allows it to work via Traefik, and therefore by the domain name.
+      vlan:
+          ipv4_address: "192.168.1.194"
+      default:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pihole.rule=Host("pihole.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.services.pihole-service.loadbalancer.server.port=80
 
   # filezilla:
   #   image: jlesage/filezilla
@@ -139,9 +147,7 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.scrutiny.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}") 
-
-
+      - traefik.http.routers.qdirstat.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}") 
 
 networks:
   default:

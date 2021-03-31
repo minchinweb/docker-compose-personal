@@ -56,24 +56,6 @@ services:
   #     - traefik.http.routers.rutorrent.rule=Host("rutorrent.${LOCAL_DOMAIN_NAME}")
   #     - traefik.http.services.rutorrent.loadbalancer.server.port=80
 
-  # deemix-build:
-  #   build: ../../build/deemix
-  #   container_name: deemix
-  #   restart: unless-stopped
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - ARL=${DEEMIX_ARL}
-  #   ports:
-  #     # - 9948:33333
-  #     - 9949:33333
-  #   volumes:
-  #     - ${DOCKER_USERDIR}/volumes/deemix/config:/config
-  #     - ${DOCKER_EXTRA_DIR}/deemix/downloads:/downloads
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.deemix.rule=Host("dmix.${LOCAL_DOMAIN_NAME}")
-
   deemix-bockiii:
     # https://gitlab.com/Bockiii/deemix-docker
     image: registry.gitlab.com/bockiii/deemix-docker
