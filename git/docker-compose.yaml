@@ -1,0 +1,36 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  gitea:
+    image: gitea/gitea:1
+    container_name: gitea
+    environment:
+      - USER_UID=${PUID}
+      - USER_GID=${PGID}
+      - GITEA__APP_NAME="Gitea on Chatelet"
+      - GITEA__ui.meta__AUTHOR="MinchinWeb"
+      - GITEA__ui.meta__DESCRIPTION="Git hosting on Normandie"
+      - GITEA__server__HTTP_PORT=${GITEA_PORT}
+    restart: unless-stopped
+    # networks:
+    #   - gitea
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - ${GITEA_PORT}:${GITEA_PORT}  # 9993
+      - "9992:22"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitea.rule=Host("git.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.services.gitea.loadbalancer.server.port=${GITEA_PORT}  # internal port, when multiple ports are exposed
+
+
+networks:
+  default:
+    external:
+      name: meta_external

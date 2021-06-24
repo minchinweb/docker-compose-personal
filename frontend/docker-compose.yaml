@@ -15,8 +15,8 @@ services:
       - --providers.docker  # 2.0
       - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.${LOCAL_DOMAIN_NAME}`)
       - --entryPoints.web.address=:80
-      - --entryPoints.websecure.address=:443
       - --entrypoints.web.forwardedHeaders.trustedIPs=192.168.1.1
+      - --entryPoints.websecure.address=:443
       - --entrypoints.websecure.forwardedHeaders.trustedIPs=192.168.1.1
       # HTTPS Certificate
       - --certificatesResolvers.myresolver.acme.email=${TRAEFIK_ACME_EMAIL}

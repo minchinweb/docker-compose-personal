@@ -103,6 +103,7 @@ services:
   #     - ${DOCKER_EXTRA_DIR}:/storage/d
 
   scrutiny:
+    # hard drive monitoring
     image: ghcr.io/linuxserver/scrutiny
     # container_name: scrutiny
     cap_add:
