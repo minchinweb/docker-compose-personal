@@ -1,0 +1,26 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  cqc:
+    build:
+      context: ../../burst-energy-quote-calculator
+      dockerfile: ./.docker/Dockerfile
+    container_name: cqc
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - CQC_SITE_URL=http://localhost:9902
+    # volumes:
+    #   - ${DOCKER_USERDIR}/be-cqc:/config
+    ports:
+      - 9902:80
+
+networks:
+  default:
+    external:
+      name: meta_external
