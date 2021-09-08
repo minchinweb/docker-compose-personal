@@ -156,7 +156,7 @@ networks:
   vlan:
     driver: macvlan
     driver_opts:
-      parent: enp0s25
+      parent: ${NETWORK_INTERFACE}
     ipam:
       config:
         - subnet: 192.168.1.0/24
