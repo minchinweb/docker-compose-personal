@@ -6,28 +6,43 @@ version: '2.4'
 services:
   # meta
   traefik:
-    image: traefik:2.4
+    image: traefik:2.5
     command:
       # - --configFile=/config/traefik.old.toml
       # - --accessLog.filePath=/var/log/access.log
       # - --accessLog.filters.statusCodes=400-499
+      - --global.sendanonymoususage=false
+
+      - --api=true
       - --api.insecure=true  # 2.0
-      - --providers.docker  # 2.0
+      - --api.dashboard=true
+
+      - --providers.docker=true  # 2.0
+      - --providers.docker.exposedByDefault=false
       - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.${LOCAL_DOMAIN_NAME}`)
-      - --entryPoints.web.address=:80
-      - --entrypoints.web.forwardedHeaders.trustedIPs=192.168.1.1
-      - --entryPoints.websecure.address=:443
-      - --entrypoints.websecure.forwardedHeaders.trustedIPs=192.168.1.1
+      - --providers.docker.network=meta_external
+      # - --providers.file.filename=/config/rules.toml
+
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.forwardedheaders.trustedips=192.168.1.1
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.forwardedheaders.trustedips=192.168.1.1
+      - --entrypoints.websecure.http.tls.certresolver=myresolver
+
       # HTTPS Certificate
-      - --certificatesResolvers.myresolver.acme.email=${TRAEFIK_ACME_EMAIL}
-      - --certificatesResolvers.myresolver.acme.storage=/etc/traefik/acme/acme.json
-      - --certificatesResolvers.myresolver.acme.httpChallenge.entryPoint=web
+      - --certificatesresolvers.myresolver.acme.email=${TRAEFIK_ACME_EMAIL}
+      - --certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme/acme.json
+      - --certificatesresolvers.myresolver.acme.httpChallenge=true
+      - --certificatesresolvers.myresolver.acme.httpChallenge.entryPoint=web
+      # - --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory  # Staging server
+
       # access logs visible through stdout
       - --accesslog=true
       - --accesslog.filters.statuscodes=300-599  # so not 200 (success)
       - --accesslog.filters.minduration=10ms
       - --accesslog.filters.retryattempts
       - --accesslog.filepath=/var/log/access.log
+
       # - --log.level=DEBUG
       # TODO: push stats to InfluxDB
     hostname: traefik
@@ -51,7 +66,7 @@ services:
       # - traefik.docker.watch=true
       - traefik.http.routers.traefik-container.rule=Host("traefik.${LOCAL_DOMAIN_NAME}")  # 2.0
       - traefik.http.services.traefik-container.loadbalancer.server.port=8080  # internal port, when multiple ports are exposed
-      - traefik.providers.docker.exposedByDefault=false
+      # - traefik.providers.docker.exposedByDefault=false
       # - traefik.http.routers.traefik-container.rule=Host("${LOCAL_DOMAIN_NAME}") && PathPrefix("/traefik")  # 2.0
       # - traefik.http.middlewares.traefik-container.stripprefix.prefixes=/traefik
 

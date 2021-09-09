@@ -15,19 +15,20 @@ services:
   # DDNS is done under the 'ddns' stack
 
   bitwarden:
-    image: bitwardenrs/server:latest
-    # container_name: bitwarden
+    image: vaultwarden/server:latest
+    container_name: bitwarden
     restart: unless-stopped
-    user: ${PUID}:${PGID}
+    # user: ${PUID}:${PGID}
     environment:
       - TZ=${TZ}
       - ROCKET_PORT=8080
       - WEBSOCKET_ENABLED=true
       - ADMIN_TOKEN=${BITWARDEN_ADMIN_TOKEN}  # value in config.json overrules this
-      - SIGNUPS_ALLOWED=false
+      - DOMAIN=https://vault.${PUBLIC_DOMAIN_NAME}
+      # - SIGNUPS_ALLOWED=false
       # - INVITATIONS_ALLOWED=false
     volumes:
-      - ${DOCKER_USERDIR}/volumes/bitwarden_rs:/data
+      - ${DOCKER_USERDIR}/volumes/vaultwarden:/data
     ports:
       - 9962:8080
       # websocket
@@ -37,23 +38,23 @@ services:
       - traefik.enable=true
       # specify internal port
       - traefik.http.services.bitwarden-service.loadbalancer.server.port=8080
-      - traefik.http.routers.bitwarden-local.service=bitwarden-service
-      - traefik.http.routers.bitwarden-local-secure.service=bitwarden-service
+      # - traefik.http.routers.bitwarden-local.service=bitwarden-service
+      # - traefik.http.routers.bitwarden-local-secure.service=bitwarden-service
       - traefik.http.routers.bitwarden.service=bitwarden-service
       - traefik.http.routers.bitwarden-secure.service=bitwarden-service
 
 
-      - traefik.http.routers.bitwarden-local.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.bitwarden-local.entrypoints=web
-      - traefik.http.routers.bitwarden-local.middlewares=bitwarden-local-to-https
+      # - traefik.http.routers.bitwarden-local.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.bitwarden-local.entrypoints=web
+      # - traefik.http.routers.bitwarden-local.middlewares=bitwarden-local-to-https
 
-      - traefik.http.routers.bitwarden-local-secure.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.bitwarden-local-secure.entrypoints=websecure
-      - traefik.http.routers.bitwarden-local-secure.tls=true
-      # - traefik.http.routers.bitwarden-local-secure.tls.certresolver=myresolver
+      # - traefik.http.routers.bitwarden-local-secure.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.bitwarden-local-secure.entrypoints=websecure
+      # - traefik.http.routers.bitwarden-local-secure.tls=true
+      # # - traefik.http.routers.bitwarden-local-secure.tls.certresolver=myresolver
       
-      - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.permanent=true
+      # - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.scheme=https
+      # - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.permanent=true
 
 
       - traefik.http.routers.bitwarden.rule=Host("vault.${PUBLIC_DOMAIN_NAME}")
@@ -76,6 +77,7 @@ services:
       - traefik.http.routers.bitwarden-websocket-secure.rule=Host("vault.${PUBLIC_DOMAIN_NAME}") && Path("/notifications/hub")
       - traefik.http.routers.bitwarden-websocket-secure.entrypoints=websecure
       - traefik.http.routers.bitwarden-websocket-secure.tls=true
+      - traefik.http.routers.bitwarden-websocket-secure.tls.certresolver=myresolver
 
 
       - traefik.http.services.bitwarden-websocket-service.loadbalancer.server.port=3012
