@@ -28,6 +28,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.forwardedheaders.trustedips=192.168.1.1
       - --entrypoints.websecure.http.tls.certresolver=myresolver
+      - --entrypoints.minecraft.address=:19132
 
       # HTTPS Certificate
       - --certificatesresolvers.myresolver.acme.email=${TRAEFIK_ACME_EMAIL}

@@ -27,6 +27,7 @@ services:
       - ${DOCKER_USERDIR}/volumes/ngircd:/config/docker/volumes/ngircd
       - ${DOCKER_USERDIR}/volumes/thelounge:/config/docker/volumes/thelounge
       - ${DOCKER_USERDIR}/volumes/rutorrent:/config/docker/volumes/rutorrent
+      - ${DOCKER_USERDIR}/volumes/minecraft:/config/docker/volumes/minecraft
       # - ${DOCKER_USERDIR}/volumes/shared:/shared
     ports:
       # - 9934:8443

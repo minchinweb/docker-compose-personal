@@ -24,31 +24,36 @@ services:
     ports:
       - 19132:19132/udp
     labels:
+      # better to just enable port forwarding
       - traefik.enable=true
-      - traefik.http.routers.minecraft.rule=Host("minecraft.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.minecraft-local.rule=Host("minecraft.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.minecraft-local.entrypoint=minecraft
 
-  bedrock_survival:
-    image: itzg/minecraft-bedrock-server
-    restart: unless-stopped
-    environment:
-      - EULA=TRUE
-      # - VERSION=${MINECRAFT_VERSION}
-      - UID=${PUID}
-      - GID=${PGID}
-      - GAMEMODE=survival
-      - DIFFICULTY=normal
-      - SERVER_NAME=Normandie Survival
-      - SERVER_PORT=19134
-      - VIEW_DISTANCE=72
-      - MAX_THREADS=8
-      - LEVEL_NAME=Minchin Family Survival
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/minecraft-survival:/data
-    ports:
-      - 19134:19134/udp
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.minecraft-survival.rule=Host("minecraft-survival.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.minecraft.rule=Host("${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.minecraft.entrypoint=minecraft
+
+   # bedrock_survival:
+   # image: itzg/minecraft-bedrock-server
+   # restart: unless-stopped
+   # environment:
+   #   - EULA=TRUE
+   #   # - VERSION=${MINECRAFT_VERSION}
+   #   - UID=${PUID}
+   #   - GID=${PGID}
+   #   - GAMEMODE=survival
+   #   - DIFFICULTY=normal
+   #   - SERVER_NAME=Normandie Survival
+   #   - SERVER_PORT=19134
+   #   - VIEW_DISTANCE=72
+   #   - MAX_THREADS=8
+   #   - LEVEL_NAME=Minchin Family Survival
+   # volumes:
+   #   - ${DOCKER_USERDIR}/volumes/minecraft-survival:/data
+   # ports:
+   #   - 19134:19134/udp
+   # labels:
+   #   - traefik.enable=true
+   #   - traefik.http.routers.minecraft-survival.rule=Host("minecraft-survival.${LOCAL_DOMAIN_NAME}")
 
 networks:
   default:

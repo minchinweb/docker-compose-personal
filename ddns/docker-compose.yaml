@@ -72,8 +72,25 @@ services:
     labels:
       - traefik.enable=false
 
+  # ddns-minecraft:
+  #   # for Minecraft (Peaceful)
+  #   # build: ../../build/ddns
+  #   image: minchinweb/ddns
+  #   container_name: ddns_minecraft.${PUBLIC_DOMAIN_NAME}
+  #   restart: unless-stopped
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - DDNS_DOMAIN_NAME=mc.${PUBLIC_DOMAIN_NAME}
+  #     - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+  #     - DDNS_KEY=${DDNS_KEY_MINECRAFT}
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #   labels:
+  #     - traefik.enable=false
+
   ddns-navidrome:
-    # for Navidrom
+    # for Navidrome
     # build: ../../build/ddns
     image: minchinweb/ddns
     container_name: ddns_music.${PUBLIC_DOMAIN_NAME}
