@@ -150,6 +150,28 @@ services:
       - traefik.enable=true
       - traefik.http.routers.qdirstat.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}") 
 
+
+  rsnapshot:
+    image: lscr.io/linuxserver/rsnapshot
+    container_name: rsnapshot
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/mods:universal-docker
+    volumes:
+      # backup from /data to /.snapshots
+      - ${DOCKER_USERDIR}/volumes/rsnapshot:/config
+      - ${NAS_DIR}/home/trocadero:/.snapshots
+      - ${DOCKER_USERDIR}/volumes:/data/volumes:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    labels:
+      - traefik.enable=false
+
+
+
+
 networks:
   default:
     name: meta_external

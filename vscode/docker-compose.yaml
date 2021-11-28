@@ -22,6 +22,7 @@ services:
       - ${DOCKER_USERDIR}/compose:/config/docker/compose
       - ${DOCKER_USERDIR}/volumes/homeassistant:/config/docker/volumes/homeassistant
       - ${DOCKER_USERDIR}/volumes/homeassistant.old:/config/docker/volumes/homeassistant.old
+      - ${DOCKER_USERDIR}/volumes/rsnapshot:/config/docker/volumes/rsnapshot
       - ${DOCKER_USERDIR}/volumes/traefik:/config/docker/volumes/traefik
       - ${DOCKER_USERDIR}/volumes/unifi/data/sites/default:/config/docker/volumes/unifi
       - ${DOCKER_USERDIR}/volumes/ngircd:/config/docker/volumes/ngircd

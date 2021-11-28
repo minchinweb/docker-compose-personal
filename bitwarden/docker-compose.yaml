@@ -14,9 +14,9 @@ services:
 
   # DDNS is done under the 'ddns' stack
 
-  bitwarden:
+  vaultwarden:
     image: vaultwarden/server:latest
-    container_name: bitwarden
+    container_name: vaultwarden
     restart: unless-stopped
     # user: ${PUID}:${PGID}
     environment:
@@ -87,6 +87,33 @@ services:
       - traefik.http.middlewares.bitwarden-websocket-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.bitwarden-websocket-to-https.redirectscheme.permanent=true
 
+
+  # backup:
+  #   # to set up rclone remote before first run (here, type 'local', named 'local')
+  #   # docker run -it -v /home/william/docker/volumes/vaultwarden-backup/:/config/ ttionya/vaultwarden-backup:latest rclone config
+  #   image: ttionya/vaultwarden-backup:latest
+  #   restart: always
+  #   environment:
+  #     - RCLONE_REMOTE_NAME=local
+  #     - RCLONE_REMOTE_DIR=/backup/
+  #     - CRON="5 * * * *"
+  #     # - ZIP_ENABLE='TRUE'
+  #     # - ZIP_PASSWORD='WHEREISMYPASSWORD?'
+  #     # - ZIP_TYPE='zip'
+  #     - BACKUP_FILE_DATE_SUFFIX="-%H%M%S"
+  #     - BACKUP_KEEP_DAYS=30
+  #     # - PING_URL=''
+  #     # - MAIL_SMTP_ENABLE='FALSE'
+  #     # - MAIL_SMTP_VARIABLES=''
+  #     # - MAIL_TO=''
+  #     # - MAIL_WHEN_SUCCESS='TRUE'
+  #     # - MAIL_WHEN_FAILURE='TRUE'
+  #     - TIMEZONE=${TZ}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/vaultwarden:/bitwarden/data/:ro
+  #     - ${DOCKER_USERDIR}/volumes/vaultwarden-backup:/config/
+  #     - ${NAS_DIR}/home/docker/vaultwarden-backup:/backup/
+  #   #   - /path/to/env:/.env
 
 networks:
   default:
