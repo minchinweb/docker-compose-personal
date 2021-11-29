@@ -7,6 +7,7 @@ services:
 
   bedrock_peaceful:
     image: itzg/minecraft-bedrock-server
+    container_name: minecraft_bedrock_peaceful
     restart: unless-stopped
     environment:
       - EULA=TRUE
@@ -23,14 +24,16 @@ services:
       - ${DOCKER_USERDIR}/volumes/minecraft:/data
     ports:
       - 19132:19132/udp
-    labels:
-      # better to just enable port forwarding
-      - traefik.enable=true
-      - traefik.http.routers.minecraft-local.rule=Host("minecraft.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.minecraft-local.entrypoint=minecraft
+    stdin_open: true
+    tty: true
+    # labels:
+    #   # better to just enable port forwarding
+    #   - traefik.enable=true
+    #   - traefik.http.routers.minecraft-local.rule=Host("minecraft.${LOCAL_DOMAIN_NAME}")
+    #   - traefik.http.routers.minecraft-local.entrypoint=minecraft
 
-      - traefik.http.routers.minecraft.rule=Host("${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.minecraft.entrypoint=minecraft
+    #   - traefik.http.routers.minecraft.rule=Host("${PUBLIC_DOMAIN_NAME}")
+    #   - traefik.http.routers.minecraft.entrypoint=minecraft
 
    # bedrock_survival:
    # image: itzg/minecraft-bedrock-server
@@ -54,6 +57,24 @@ services:
    # labels:
    #   - traefik.enable=true
    #   - traefik.http.routers.minecraft-survival.rule=Host("minecraft-survival.${LOCAL_DOMAIN_NAME}")
+
+  backup:
+    image: kaiede/minecraft-bedrock-backup
+    # name: bedrock_backup
+    restart: unless-stopped
+    depends_on:
+      - bedrock_peaceful
+    environment:
+      - UID=${PUID}
+      - GID=${PGID}
+      - TZ=${TZ}
+      - BACKUP_INTERVAL=3h
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_USERDIR}/volumes/minecraft:/server
+      - ${NAS_DIR}/home/trocadero/minecraft:/backups
+    stdin_open: true
+    tty: true
 
 networks:
   default:
