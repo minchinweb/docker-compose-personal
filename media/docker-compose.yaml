@@ -237,6 +237,7 @@ services:
       - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.permanent=true
 
   navidrome:
+    # backup is on crony stack
     image: deluan/navidrome:latest
     container_name: navidrome
     user: ${PUID}:${PGID}  # should be owner of volumes
@@ -246,7 +247,7 @@ services:
     environment:
       - TZ=${TZ}
       # Optional: put your config options customization here. Examples:
-      - ND_SCANINTERVAL=15m
+      - ND_SCANSCHEDULE=15m
       - ND_LOGLEVEL=info  
       - ND_SESSIONTIMEOUT=24h
       - ND_BASEURL=/

@@ -1,0 +1,46 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  # crony allows you to run docker containers on a cron-like schedule. 
+  # It is assumed that the container will exit when complete.
+  crony:
+    image: ghcr.io/0xerr0r/crony:latest
+    container_name: crony
+    volumes:
+      # needs access to host docker socket to read container labels and start job containers
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # to synchronize the time zone with host
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      # # mail settings
+      # - SMTP_HOST=smtp.gmail.com 
+      # - SMTP_PORT=587
+      # - SMTP_USER=xxx@googlemail.com
+      # - SMTP_PASSWORD=xxx
+      # - MAIL_TO=xxx@gmail.com
+      # - MAIL_FROM=CRONY <xxx@googlemail.com>
+      # global mail policy: always, never or onerror
+      - MAIL_POLICY=never
+      # optional: log level (one of trace, debug, info, warn, error, fatal), info is default if not set
+      - LOG_LEVEL=info
+    mem_limit: 30MB
+
+  navidrome-backup:
+    image: ghcr.io/0xerr0r/navidrome-backup-docker
+    container_name: navidrome-backup
+    # depends_on:
+    #   - navidrome
+    volumes:
+      - ${NAS_DIR}/home/trocadero/navidrome:/out
+      - ${DOCKER_USERDIR}/volumes/navidrome:/data
+    labels:
+      # every monday
+      - crony.schedule="0 0 * * 1"
+
+networks:
+  default:
+    external:
+      name: meta_external
