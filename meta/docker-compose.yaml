@@ -60,7 +60,7 @@ services:
       DOZZLE_FILTER: "status=running"
       # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.dozzle.rule=Host("dozzle.${LOCAL_DOMAIN_NAME}")
@@ -105,7 +105,7 @@ services:
   scrutiny:
     # hard drive monitoring
     image: ghcr.io/linuxserver/scrutiny
-    # container_name: scrutiny
+    container_name: scrutiny
     cap_add:
       - SYS_RAWIO
       # - SYS_ADMIN # optional, required for NVMe drives
@@ -136,6 +136,7 @@ services:
 
   qdirstat:
     image: jlesage/qdirstat
+    container_name: qdirstat
     environment:
       - PUID=${PUID}
       - PGID=${PGID}

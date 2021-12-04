@@ -26,7 +26,7 @@ services:
       - ${DOCKER_USERDIR}/volumes/qbittorrent/:/config
       # - ${DOCKER_USERDIR}/volumes/qbittorrent-downloads:/downloads
       - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive
-      - ${DOCKER_EXTRA_DIR_2}/qbittorrent/more-downloads:/mnt/d  # 'D' drive
+      # - ${DOCKER_EXTRA_DIR_2}/qbittorrent/more-downloads:/mnt/d  # 'D' drive
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -82,7 +82,7 @@ services:
     # this is *just* the web interface from Calibre
     # with the Docker Mod, it pulls and installs a bunch of stuff from
     # `apt`, so it takes a while to start up
-    image: ghcr.io/linuxserver/calibre-web
+    image: lscr.io/linuxserver/calibre-web
     container_name: calibre-web
     environment:
       - PUID=${PUID}
@@ -106,7 +106,7 @@ services:
     # best OPDS feed for calibre
     
     # provides a web interface and OPDS feed for calibre
-    image: ghcr.io/linuxserver/cops
+    image: lscr.io/linuxserver/cops
     container_name: cops
     environment:
       - PUID=${PUID}
@@ -204,7 +204,7 @@ services:
 
   # works, but uses 650MB of RAM at rest
   booksonic-air:
-    image: ghcr.io/linuxserver/booksonic-air
+    image: lscr.io/linuxserver/booksonic-air
     container_name: booksonic-air
     environment:
       - PUID=${PUID}

@@ -91,7 +91,7 @@ services:
   landingpage:
     # serve a static file as the "landing page"
     image: halverneus/static-file-server
-    restart: always
+    restart: unless-stopped
     environment:
       - FOLDER=/config
       - DEBUG=true

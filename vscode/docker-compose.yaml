@@ -6,7 +6,7 @@ version: '2.4'
 services:
 
   vscode:
-    image: ghcr.io/linuxserver/code-server
+    image: lscr.io/linuxserver/code-server
     container_name: vscode
     restart: unless-stopped
     environment:
@@ -17,19 +17,20 @@ services:
       # - SUDO_PASSWORD=password #optional 
     volumes:
       - ${DOCKER_USERDIR}/volumes/code-server-lsio:/config
-      - ${DOCKER_USERDIR}/sorbonne:/config/docker/sorbonne
-      - ${DOCKER_USERDIR}/build:/config/docker/builders
+      # - ${DOCKER_USERDIR}/sorbonne:/config/docker/sorbonne
+      - ${DOCKER_USERDIR}/build:/config/docker/build
       - ${DOCKER_USERDIR}/compose:/config/docker/compose
       - ${DOCKER_USERDIR}/volumes/homeassistant:/config/docker/volumes/homeassistant
       - ${DOCKER_USERDIR}/volumes/homeassistant.old:/config/docker/volumes/homeassistant.old
       - ${DOCKER_USERDIR}/volumes/rsnapshot:/config/docker/volumes/rsnapshot
       - ${DOCKER_USERDIR}/volumes/traefik:/config/docker/volumes/traefik
       - ${DOCKER_USERDIR}/volumes/unifi/data/sites/default:/config/docker/volumes/unifi
-      - ${DOCKER_USERDIR}/volumes/ngircd:/config/docker/volumes/ngircd
-      - ${DOCKER_USERDIR}/volumes/thelounge:/config/docker/volumes/thelounge
-      - ${DOCKER_USERDIR}/volumes/rutorrent:/config/docker/volumes/rutorrent
-      - ${DOCKER_USERDIR}/volumes/minecraft:/config/docker/volumes/minecraft
+      # - ${DOCKER_USERDIR}/volumes/ngircd:/config/docker/volumes/ngircd
+      # - ${DOCKER_USERDIR}/volumes/thelounge:/config/docker/volumes/thelounge
+      # - ${DOCKER_USERDIR}/volumes/rutorrent:/config/docker/volumes/rutorrent
+      # - ${DOCKER_USERDIR}/volumes/minecraft:/config/docker/volumes/minecraft
       # - ${DOCKER_USERDIR}/volumes/shared:/shared
+      - ${DOCKER_USERDIR}/backup:/config/docker/backup
     ports:
       # - 9934:8443
       - 9911:8443
