@@ -104,7 +104,7 @@ services:
 
   scrutiny:
     # hard drive monitoring
-    image: ghcr.io/linuxserver/scrutiny
+    image: lscr.io/linuxserver/scrutiny
     container_name: scrutiny
     cap_add:
       - SYS_RAWIO

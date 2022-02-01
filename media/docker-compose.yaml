@@ -6,7 +6,7 @@ version: '2.4'
 services:
   # media
   qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent
+    image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
     hostname: qbt
     environment:
@@ -125,7 +125,7 @@ services:
   # c.f. https://hub.docker.com/r/linuxserver/calibre
 
   # ubooquity:
-  #   image: linuxserver/ubooquity
+  #   image: lscr.io/linuxserver/ubooquity
   #   container_name: ubooquity
   #   environment:
   #     - PUID=${PUID}

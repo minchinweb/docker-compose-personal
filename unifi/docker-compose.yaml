@@ -5,7 +5,7 @@ version: '2.4'
 
 services:
   unifi:
-    image: linuxserver/unifi-controller
+    image: lscr.io/linuxserver/unifi-controller
     container_name: unifi
     hostname: unifi
     environment:

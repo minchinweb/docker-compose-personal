@@ -5,7 +5,7 @@ version: '2.4'
 
 services:
   musicbranz:
-    image: linuxserver/musicbrainz
+    image: ghcr.io/linuxserver/musicbrainz
     # container_name: musicbrainz
     environment:
       - PUID=${PUID}
@@ -27,7 +27,7 @@ services:
       - "traefik.frontend.rule=Host:musicbrainz.${LOCAL_DOMAIN_NAME}"  
 
   beets:
-    image: linuxserver/beets
+    image: lscr.io/linuxserver/beets
     # container_name: beets
     environment:
       - PUID=${PUID}

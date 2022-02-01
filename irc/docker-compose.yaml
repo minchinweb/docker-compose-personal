@@ -5,7 +5,7 @@ version: '2.4'
 
 services:
   ngircd:
-    image: linuxserver/ngircd
+    image: lscr.io/linuxserver/ngircd
     container_name: ngircd
     environment:
       - PUID=${PUID}
@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
 
   quassel-core:
-    image: linuxserver/quassel-core
+    image: lscr.io/linuxserver/quassel-core
     container_name: quassel-core
     environment:
       - PUID=${PUID}
@@ -36,7 +36,7 @@ services:
     # can use a PostreSQL database...
 
   thelounge:
-    image: linuxserver/thelounge
+    image: lscr.io/linuxserver/thelounge
     container_name: thelounge
     environment:
       - PUID=${PUID}

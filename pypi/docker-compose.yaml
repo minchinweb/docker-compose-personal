@@ -7,7 +7,7 @@ services:
   pypi:
     # image: stevearc/pypicloud:1.0.10-py3-alpine
     # build: ../../build/pypi
-    image: minchinweb/pypi
+    image: ghcr.io/minchinweb/pypi
     restart: unless-stopped
     environment:
       - PUID=${PUID}
