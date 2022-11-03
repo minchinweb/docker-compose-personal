@@ -82,13 +82,16 @@ services:
     # this is *just* the web interface from Calibre
     # with the Docker Mod, it pulls and installs a bunch of stuff from
     # `apt`, so it takes a while to start up
-    image: lscr.io/linuxserver/calibre-web
+    image: lscr.io/linuxserver/calibre-web:nightly
     container_name: calibre-web
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
       - DOCKER_MODS=linuxserver/calibre-web:calibre
+      # allow /reconnect URL to work
+      # https://github.com/janeczku/calibre-web/issues/2336
+      - CALIBRE_RECONNECT=true
     volumes:
       - ${DOCKER_USERDIR}/volumes/calibre-web/config:/config
       - ${NAS_DIR}/ebook/calibre:/books:ro
