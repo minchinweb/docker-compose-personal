@@ -102,6 +102,19 @@ services:
       - traefik.enable=true
       # - traefik.http.routers.calibreweb2.rule=Host("${LOCAL_DOMAIN_NAME}") && PathPrefix("/books")
       - traefik.http.routers.calibreweb.rule=Host("books.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.calibreweb.entrypoints=web
+
+      - traefik.http.routers.calibreweb-public.rule=Host("books.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.calibreweb-public.entrypoints=web
+      - traefik.http.routers.calibreweb-public.middlewares=calibreweb-public-to-https
+
+      - traefik.http.routers.calibreweb-publicsecure.rule=Host("books.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.calibreweb-publicsecure.entrypoints=websecure
+      - traefik.http.routers.calibreweb-publicsecure.tls=true
+      - traefik.http.routers.calibreweb-publicsecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.calibreweb-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.calibreweb-public-to-https.redirectscheme.permanent=true
     # networks:
     #   external:
 
@@ -308,7 +321,30 @@ services:
       - ${NAS_DIR}/music/Music:/data/music:ro
       - ${NAS_DIR}/music/Audiobooks:/data/audiobooks:ro
     restart: unless-stopped
-    # labels:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.rule=Host("video.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.jellyfin.entrypoints=web
+
+      - traefik.http.services.jellyfin-service.loadbalancer.server.port=9972  # internal port, when multiple ports are exposed
+      - traefik.http.routers.jellyfin.service=jellyfin-service
+
+      - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=9972  # internal port, when multiple ports are exposed
+      - traefik.http.routers.jellyfin-public.service=jellyfin-public-service
+      - traefik.http.routers.jellyfin-publicsecure.service=jellyfin-public-service
+
+      - traefik.http.routers.jellyfin-public.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.jellyfin-public.entrypoints=web
+      - traefik.http.routers.jellyfin-public.middlewares=jellyfin-public-to-https
+
+      - traefik.http.routers.jellyfin-publicsecure.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.jellyfin-publicsecure.entrypoints=websecure
+      - traefik.http.routers.jellyfin-publicsecure.tls=true
+      - traefik.http.routers.jellyfin-publicsecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.permanent=true
+
 
 
   # PhotoPrism -- photo sorter with face and subject recongition

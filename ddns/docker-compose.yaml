@@ -72,6 +72,22 @@ services:
     labels:
       - traefik.enable=false
 
+  ddns-calibre-web:
+    # build: ../../build/ddns  # also at minchinweb/ddns:latest
+    image: ghcr.io/minchinweb/ddns
+    container_name: ddns_books.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=books.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_BOOKS}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+
   # ddns-minecraft:
   #   # for Minecraft (Peaceful)
   #   # build: ../../build/ddns
@@ -105,7 +121,23 @@ services:
       - /etc/localtime:/etc/localtime:ro
     labels:
       - traefik.enable=false
-    
+
+  ddns-jellyfin:
+    # for jellyfin
+    # build: ../../build/ddns
+    image: ghcr.io/minchinweb/ddns
+    container_name: ddns_video.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=video.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_VIDEO}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false   
 
 
 networks:
