@@ -102,6 +102,31 @@ services:
   #     - ${DOCKER_USERDIR}/volumes/filezilla/:/config:rw
   #     - ${DOCKER_EXTRA_DIR}:/storage/d
 
+  samba:
+    image: joebiellik/samba-server
+    environment:
+      - USERNAME=joe
+      - PASSWORD=samba
+      # Uncomment to override defaults
+      - UID=${PUID}
+      - GID=${PGID}
+    volumes:
+      # You must provide a Samba config file
+      - ${DOCKER_USERDIR}/volumes/samba/smb.conf:/etc/samba/smb.conf
+      # Shares
+      - ${DOCKER_USERDIR}/volumes/starbound-config:/mnt/starbound:ro
+      - ${DOCKER_USERDIR}/volumes/starbound-fu-config:/mnt/starbound-fu:ro
+      - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/mnt/torrents
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+    restart: unless-stopped
+    labels:
+      - traefik.enable=false
+
+
   scrutiny:
     # hard drive monitoring
     image: lscr.io/linuxserver/scrutiny
