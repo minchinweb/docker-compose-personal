@@ -16,7 +16,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${DOCKER_USERDIR}/volumes/starbound-app:/app:ro
+      - ${DOCKER_USERDIR}/volumes/starbound-app:/app
       - ${DOCKER_USERDIR}/volumes/starbound-config:/config
     ports:
       - 21025:21025

@@ -11,7 +11,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - MEM_LIMIT=1280M
+      - MEM_LIMIT=1280
     restart: unless-stopped
     volumes:
       - ${DOCKER_USERDIR}/volumes/unifi:/config

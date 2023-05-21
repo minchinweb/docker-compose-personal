@@ -73,6 +73,9 @@ services:
 
       ## HTTP --> HTTPS redirect
       # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      ## Export states to Grafana
+      # https://theorangeone.net/posts/traefik-influx-metrics/
               
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -98,6 +101,7 @@ services:
     volumes:
       - ${DOCKER_USERDIR}/volumes/landing:/config
       # - /etc/localtime:/etc/localtime:ro  # doesn't make a difference
+      # - "${NAS_DIR}/video/Movies/Ghostbusters - Afterlife (2021):/config/alex:ro"
     ports:
       - 9918:8080
     labels:
