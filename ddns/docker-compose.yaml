@@ -55,22 +55,21 @@ services:
       - traefik.enable=false
 
 
-  ddns-booksonic:
-    # for booksonic-air
-    # build: ../../build/ddns
+  ddns-audiobookshelf:
+    # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
-    container_name: ddns_booksonic.${PUBLIC_DOMAIN_NAME}
+    container_name: ddns_audiobooks.${PUBLIC_DOMAIN_NAME}
     restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DDNS_DOMAIN_NAME=booksonic.${PUBLIC_DOMAIN_NAME}
+      - DDNS_DOMAIN_NAME=audiobooks.${PUBLIC_DOMAIN_NAME}
       - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
-      - DDNS_KEY=${DDNS_KEY_BOOKSONIC}
+      - DDNS_KEY=${DDNS_KEY_AUDIOBOOKS}
     volumes:
       - /etc/localtime:/etc/localtime:ro
     labels:
-      - traefik.enable=false
+      - traefik.ena
 
   ddns-calibre-web:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
@@ -83,6 +82,23 @@ services:
       - DDNS_DOMAIN_NAME=books.${PUBLIC_DOMAIN_NAME}
       - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
       - DDNS_KEY=${DDNS_KEY_BOOKS}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+
+  ddns-booksonic:
+    # for booksonic-air
+    # build: ../../build/ddns
+    image: ghcr.io/minchinweb/ddns
+    container_name: ddns_booksonic.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=booksonic.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_BOOKSONIC}
     volumes:
       - /etc/localtime:/etc/localtime:ro
     labels:
@@ -139,6 +155,20 @@ services:
     labels:
       - traefik.enable=false   
 
+  ddns-home-assistant:
+    image: ghcr.io/minchinweb/ddns
+    container_name: ddns_ha.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=ha.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_HOME_ASSISTANT}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false   
 
 networks:
   default:
