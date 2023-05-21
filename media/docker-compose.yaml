@@ -56,24 +56,24 @@ services:
   #     - traefik.http.routers.rutorrent.rule=Host("rutorrent.${LOCAL_DOMAIN_NAME}")
   #     - traefik.http.services.rutorrent.loadbalancer.server.port=80
 
-  deemix-bockiii:
-    # https://gitlab.com/Bockiii/deemix-docker
-    image: registry.gitlab.com/bockiii/deemix-docker
-    container_name: deemix
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      # - ARL="${DEEMIX_ARL}"
-      - UMASK_SET=022
-      - DEEZUI=false
-    ports:
-      - 9948:6595
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/deemix-bockiii:/config
-      - ${DOCKER_EXTRA_DIR}/deemix/downloads-2:/downloads
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.deemix.rule=Host("dmix.${LOCAL_DOMAIN_NAME}")
+  # deemix-bockiii:
+  #   # https://gitlab.com/Bockiii/deemix-docker
+  #   image: registry.gitlab.com/bockiii/deemix-docker
+  #   container_name: deemix
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     # - ARL="${DEEMIX_ARL}"
+  #     - UMASK_SET=022
+  #     - DEEZUI=false
+  #   ports:
+  #     - 9948:6595
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/deemix-bockiii:/config
+  #     - ${DOCKER_EXTRA_DIR}/deemix/downloads-2:/downloads
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.deemix.rule=Host("dmix.${LOCAL_DOMAIN_NAME}")
 
 
   calibre-web:
@@ -218,39 +218,70 @@ services:
   #     - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.scheme=https
   #     - traefik.http.middlewares.audioserve-public-to-https.redirectscheme.permanent=true
 
-  # works, but uses 650MB of RAM at rest
-  booksonic-air:
-    image: lscr.io/linuxserver/booksonic-air
-    container_name: booksonic-air
+  # # works, but uses 650MB of RAM at rest
+  # booksonic-air:
+  #   image: lscr.io/linuxserver/booksonic-air
+  #   container_name: booksonic-air
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     # - CONTEXT_PATH=url-base
+  #   ports:
+  #     - 9954:4040
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/booksonic-air:/config
+  #     - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
+  #     # - /path/to/podcasts:/podcasts
+  #     # - /path/to/othermedia:/othermedia
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.booksonicair.rule=Host("booksonic.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.booksonicair.entrypoints=web
+
+  #     - traefik.http.routers.booksonicair-public.rule=Host("booksonic.${PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.booksonicair-public.entrypoints=web
+  #     - traefik.http.routers.booksonicair-public.middlewares=booksonicair-public-to-https
+
+  #     - traefik.http.routers.booksonicair-publicsecure.rule=Host("booksonic.${PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.booksonicair-publicsecure.entrypoints=websecure
+  #     - traefik.http.routers.booksonicair-publicsecure.tls=true
+  #     - traefik.http.routers.booksonicair-publicsecure.tls.certresolver=myresolver
+      
+  #     - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.scheme=https
+  #     - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.permanent=true
+
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      # - CONTEXT_PATH=url-base
+      - AUDIOBOOKSHELF_UID=${PUID}
+      - AUDIOBOOKSHELF_GID=${PGID}
     ports:
-      - 9954:4040
+      - 9974:80
     volumes:
-      - ${DOCKER_USERDIR}/volumes/booksonic-air:/config
       - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
-      # - /path/to/podcasts:/podcasts
-      # - /path/to/othermedia:/othermedia
+      # - </path/to/podcasts>:/podcasts
+      - ${DOCKER_USERDIR}/volumes/audiobookshlef-config:/config
+      - ${DOCKER_USERDIR}/volumes/audiobookshlef-metadata:/metadata
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.booksonicair.rule=Host("booksonic.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.booksonicair.entrypoints=web
+      - traefik.http.routers.audiobookshelf.rule=Host("audiobooks.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.audiobookshelf.entrypoints=web
 
-      - traefik.http.routers.booksonicair-public.rule=Host("booksonic.${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.booksonicair-public.entrypoints=web
-      - traefik.http.routers.booksonicair-public.middlewares=booksonicair-public-to-https
+      - traefik.http.routers.audiobookshelf-public.rule=Host("audiobooks.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.audiobookshelf-public.entrypoints=web
+      - traefik.http.routers.audiobookshelf-public.middlewares=audiobookshelf-public-to-https
 
-      - traefik.http.routers.booksonicair-publicsecure.rule=Host("booksonic.${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.booksonicair-publicsecure.entrypoints=websecure
-      - traefik.http.routers.booksonicair-publicsecure.tls=true
-      - traefik.http.routers.booksonicair-publicsecure.tls.certresolver=myresolver
+      - traefik.http.routers.audiobookshelf-publicsecure.rule=Host("audiobooks.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.audiobookshelf-publicsecure.entrypoints=websecure
+      - traefik.http.routers.audiobookshelf-publicsecure.tls=true
+      - traefik.http.routers.audiobookshelf-publicsecure.tls.certresolver=myresolver
       
-      - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.booksonicair-public-to-https.redirectscheme.permanent=true
+      - traefik.http.middlewares.audiobookshelf-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.audiobookshelf-public-to-https.redirectscheme.permanent=true
 
   navidrome:
     # backup is on crony stack
@@ -307,7 +338,7 @@ services:
       - 7359:7359/udp # optional, LAN auto-discover
       # - 1900:1900/udp # optional, DLNA
     volumes:
-      - ${DOCKER_USERDIR}/volumes/jellyfin:/config
+      - ${DOCKER_EXTRA_DIR}/jellyfin:/config
       - ${NAS_DIR}/video/Movies:/data/movies:ro
       - "${NAS_DIR}/video/Movies, Kids A:/data/movies-kids-a:ro"
       - "${NAS_DIR}/video/Movies, Kids B:/data/movies-kids-b:ro"
@@ -326,10 +357,10 @@ services:
       - traefik.http.routers.jellyfin.rule=Host("video.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.jellyfin.entrypoints=web
 
-      - traefik.http.services.jellyfin-service.loadbalancer.server.port=9972  # internal port, when multiple ports are exposed
+      - traefik.http.services.jellyfin-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
       - traefik.http.routers.jellyfin.service=jellyfin-service
 
-      - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=9972  # internal port, when multiple ports are exposed
+      - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
       - traefik.http.routers.jellyfin-public.service=jellyfin-public-service
       - traefik.http.routers.jellyfin-publicsecure.service=jellyfin-public-service
 
@@ -345,7 +376,17 @@ services:
       - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.permanent=true
 
-
+  openbooks:
+    # container_name: openbooks
+    image: evanbuss/openbooks:latest
+    # environment:
+    #   - BASE_PATH=/openbooks/
+    command: --persist --name Patriarch1734
+    ports:
+      - 9976:80
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/openbooks:/books
+    restart: unless-stopped
 
   # PhotoPrism -- photo sorter with face and subject recongition
   # suggests minimum 2 cores and 4GB of memory
