@@ -195,8 +195,30 @@ services:
     labels:
       - traefik.enable=false
 
-
-
+  wiregaurd:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - SERVERURL=${PUBLIC_DOMAIN_NAME}
+      - SERVERPORT=${WIREGUARD_PORT}
+      - PEERS=WilliamPhone  # comma seperated list
+      - PEERDNS=${PIHOLE_IP}  # optional
+      # - INTERNAL_SUBNET=10.13.13.0  # Internal subnet for the wireguard and server and peers (only change if it clashes)
+      # - ALLOWEDIPS=0.0.0.0/0  # The IPs/Ranges that the peers will be able to reach using the VPN connection.
+      # - PERSISTENTKEEPALIVE_PEERS=  # optional
+      - LOG_CONFS=true  # optional, generated QR codes will be displayed in the docker log
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/wireguard:/config
+    ports:
+      - ${WIREGUARD_PORT}:${WIREGUARD_PORT}/udp  # 51820
+    # sysctls:
+    #   - net.ipv4.conf.all.src_valid_mark=1  # Required for client mode
+    restart: unless-stopped
 
 networks:
   default:
