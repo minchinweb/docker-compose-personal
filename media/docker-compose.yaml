@@ -410,8 +410,32 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.navidrome.rule=Host("radarr.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.navidrome.entrypoints=web
+      - traefik.http.routers.radarr.rule=Host("radarr.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.radarr.entrypoints=web
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/sonarr:/config
+      - ${NAS_DIR}/video/TV Shows:/video/TV Shows
+      - "${NAS_DIR}/video/TV Shows [FR]:/video/TV Shows [FR]"
+      - "${NAS_DIR}/video/TV Shows, Kids A:/video/TV Shows, Kids A"
+      - "${NAS_DIR}/video/TV Shows, Kids B:/video/TV Shows, Kids B"
+      - "${NAS_DIR}/video/_import/tv:/video/_import/tv"  # unsorted, downloaded elsewhere
+      - "${NAS_DIR}/video/_duplicates:/video/_duplicates"  # "trash"
+      - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive; match qbittorrent
+    ports:
+      - 9982:8989
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.rule=Host("sonarr.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.sonarr.entrypoints=web
 
 
   # PhotoPrism -- photo sorter with face and subject recongition
