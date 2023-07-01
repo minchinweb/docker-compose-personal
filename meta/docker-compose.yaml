@@ -75,17 +75,32 @@ services:
     #   - "67:67/udp"
     #   - "80:80/tcp"
     #   - "443:443/tcp"
+    expose:
+      - "53"
+      - "80"
+      - "443"
     environment:
       - TZ=${TZ}
-      # - WEBPASSWORD=${PIHOLE_PASSWORD}
+      - WEBPASSWORD=${PIHOLE_PASSWORD}
+      - FTLCONF_LOCAL_IPV4=192.168.1.194
+      - REV_SERVER=true
+      - REV_SERVER_TARGET=192.168.1.1
+      - REV_SERVER_CIDR=192.168.1.0/24
+      - REV_SERVER_DOMAIN=lan
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
     volumes:
       - ${DOCKER_USERDIR}/volumes/pihole/etc-pihole/:/etc/pihole/
       - ${DOCKER_USERDIR}/volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
     networks:
       # list both networks. The `vlan` allows it to be usable as a DNS server, while the
       # `default` network allows it to work via Traefik, and therefore by the domain name.
+      #
+      # make sure to enable "permit all origins" under "Interface settings" (otherwise it
+      # will only work on one of the two networks)
       vlan:
-          ipv4_address: "192.168.1.194"
+        ipv4_address: "192.168.1.194"
       default:
     labels:
       - traefik.enable=true
