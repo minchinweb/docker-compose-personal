@@ -392,6 +392,7 @@ services:
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    hostname: radarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -406,7 +407,7 @@ services:
       - "${NAS_DIR}/video/_duplicates:/video/_duplicates"  # "trash"
       - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive; match qbittorrent
     ports:
-      - 9980:7878
+      - 7878:7878
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -416,6 +417,7 @@ services:
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    hostname: sonarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -430,12 +432,46 @@ services:
       - "${NAS_DIR}/video/_duplicates:/video/_duplicates"  # "trash"
       - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive; match qbittorrent
     ports:
-      - 9982:8989
+      - 8989:8989
     restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host("sonarr.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.sonarr.entrypoints=web
+
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    hostname: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.rule=Host("prowlarr.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.prowlarr.entrypoint=web
+
+
+  flaresolverr:
+    # DockerHub mirror flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    hostname: flaresolverr
+    environment:
+      - LOG_LEVEL=${FLARESOLVERR_LOG_LEVEL:-info}
+      - LOG_HTML=${FLARESOLVERR_LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${FLARESOLVERR_CAPTCHA_SOLVER:-none}
+      - TZ=${TZ}
+    ports:
+      - 8191:8191
+    restart: unless-stopped 
 
 
   # PhotoPrism -- photo sorter with face and subject recongition
