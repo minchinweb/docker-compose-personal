@@ -1,0 +1,36 @@
+version: '2.4'
+
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  fresh-rss:
+    # Access the webui set up wizard at http://serverIP:port
+    #
+    # For external databases, create a user and database in your mysql/mariadb
+    # server (not root) and then follow the setup wizard in the webui. Use the
+    # IP address for "host" of your database server.
+    #
+    # Additional extensions can be dropped into /config/www/freshrss/extensions
+    # and will be active after container restart.
+
+    image: lscr.io/linuxserver/freshrss:latest
+    container_name: fresh-rss
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/fresh-rss:/config
+    ports:
+      - 9980:80
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.fresh-rss.rule=Host("reader.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.services.fresh-rss.loadbalancer.server.port=80  # internal port, when multiple ports are exposed
+
+networks:
+  default:
+    external:
+      name: meta_external
