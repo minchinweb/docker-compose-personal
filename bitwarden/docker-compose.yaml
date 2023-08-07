@@ -38,22 +38,24 @@ services:
       - traefik.enable=true
       # specify internal port
       - traefik.http.services.bitwarden-service.loadbalancer.server.port=8080
-      # - traefik.http.routers.bitwarden-local.service=bitwarden-service
-      # - traefik.http.routers.bitwarden-local-secure.service=bitwarden-service
       - traefik.http.routers.bitwarden.service=bitwarden-service
       - traefik.http.routers.bitwarden-secure.service=bitwarden-service
-
-
-      # - traefik.http.routers.bitwarden-local.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
-      # - traefik.http.routers.bitwarden-local.entrypoints=web
-      # - traefik.http.routers.bitwarden-local.middlewares=bitwarden-local-to-https
-
-      # - traefik.http.routers.bitwarden-local-secure.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
-      # - traefik.http.routers.bitwarden-local-secure.entrypoints=websecure
-      # - traefik.http.routers.bitwarden-local-secure.tls=true
-      # # - traefik.http.routers.bitwarden-local-secure.tls.certresolver=myresolver
       
-      # - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.scheme=https
+      - traefik.http.services.bitwarden-local-service.loadbalancer.server.port=8080
+      - traefik.http.routers.bitwarden-local.service=bitwarden-local-service
+      - traefik.http.routers.bitwarden-local-secure.service=bitwarden-local-service
+
+
+      - traefik.http.routers.bitwarden-local.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.bitwarden-local.entrypoints=web
+      - traefik.http.routers.bitwarden-local.middlewares=bitwarden-local-to-https
+
+      - traefik.http.routers.bitwarden-local-secure.rule=Host("vault.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.bitwarden-local-secure.entrypoints=websecure
+      - traefik.http.routers.bitwarden-local-secure.tls=true
+      # - traefik.http.routers.bitwarden-local-secure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.scheme=https
       # - traefik.http.middlewares.bitwarden-local-to-https.redirectscheme.permanent=true
 
 
