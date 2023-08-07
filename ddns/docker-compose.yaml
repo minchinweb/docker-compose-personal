@@ -4,6 +4,22 @@ version: '2.4'
 # in the same directory as this file
 
 services:
+  ddns-baffinsisland:
+    # build: ../../build/ddns  # also at minchinweb/ddns:latest
+    image: ghcr.io/minchinweb/ddns
+    container_name: ddns_baffinisland
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=${BAFFINISLAND_PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_BAFFINISLAND}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false
+
   ddns-base:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
