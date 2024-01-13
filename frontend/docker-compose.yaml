@@ -6,7 +6,7 @@ version: '2.4'
 services:
   # meta
   traefik:
-    image: traefik:2.6
+    image: traefik:2.10
     command:
       # - --configFile=/config/traefik.old.toml
       # - --accessLog.filePath=/var/log/access.log
