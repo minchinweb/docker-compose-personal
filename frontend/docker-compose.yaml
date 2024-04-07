@@ -124,6 +124,43 @@ services:
 
       - traefik.http.routers.landing-page-internal.rule=Host("${LOCAL_DOMAIN_NAME}")
 
+  jrnl:
+    # serve my notes as a pre-rendered static site
+    # don't make publically available without access control
+    image: halverneus/static-file-server
+    restart: unless-stopped
+    environment:
+      - FOLDER=/config
+      - DEBUG=true
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/jrnl:/config
+      # - /etc/localtime:/etc/localtime:ro  # doesn't make a difference
+      # - "${NAS_DIR}/video/Movies/Ghostbusters - Afterlife (2021):/config/alex:ro"
+    ports:
+      - 9990:8080
+    labels:
+      - traefik.enable=true
+ 
+      # # declare both the HTTP and HTTPS versions, and then a middleware
+      # # that redirects HTTP --> HTTPS
+      # - traefik.http.routers.jrnl.rule=Host("jrnl.${PUBLIC_DOMAIN_NAME}")
+      # - traefik.http.routers.jrnl.entrypoints=web
+      # - traefik.http.routers.jrnl.middlewares=landing-page-to-https
+      
+      # - traefik.http.routers.jrnl-secure.rule=Host("jrnl.${PUBLIC_DOMAIN_NAME}")
+      # - traefik.http.routers.jrnl-secure.entrypoints=websecure
+      # - traefik.http.routers.jrnl-secure.tls=true
+      # - traefik.http.routers.jrnl-secure.tls.certresolver=myresolver
+      
+      # - traefik.http.middlewares.jrnl-to-https.redirectscheme.scheme=https
+      # - traefik.http.middlewares.jrnl-to-https.redirectscheme.permanent=true
+
+      - traefik.http.routers.jrnl-internal.rule=Host("jrnl.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.jrnl-internal.tls.certresolver=none  # for .lan domain, no ACME challenge
+      # - traefik.http.routers.jrnl-internal.tls=false  # for .lan domain, no ACME challenge
+
+
+
 networks:
   default:
     external:

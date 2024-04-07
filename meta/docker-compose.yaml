@@ -132,6 +132,7 @@ services:
       - ${DOCKER_USERDIR}/volumes/starbound-config:/mnt/starbound:ro
       - ${DOCKER_USERDIR}/volumes/starbound-fu-config:/mnt/starbound-fu:ro
       - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/mnt/torrents
+      - ${DOCKER_USERDIR}/volumes/jrnl:/mnt/jrnl
     ports:
       - "137:137/udp"
       - "138:138/udp"

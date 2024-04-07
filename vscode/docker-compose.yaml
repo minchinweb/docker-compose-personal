@@ -30,6 +30,7 @@ services:
       # - ${DOCKER_USERDIR}/volumes/thelounge:/config/docker/volumes/thelounge
       # - ${DOCKER_USERDIR}/volumes/rutorrent:/config/docker/volumes/rutorrent
       # - ${DOCKER_USERDIR}/volumes/minecraft:/config/docker/volumes/minecraft
+      - ${DOCKER_USERDIR}/volumes/samba/:/config/docker/volumes/samba
       # - ${DOCKER_USERDIR}/volumes/shared:/shared
       - ${DOCKER_USERDIR}/backup:/config/docker/backup
     ports:
