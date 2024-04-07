@@ -254,6 +254,7 @@ services:
 
   audiobookshelf:
     container_name: audiobookshelf
+    hostname: audiobookshelf
     image: ghcr.io/advplyr/audiobookshelf:latest
     environment:
       - AUDIOBOOKSHELF_UID=${PUID}
@@ -456,7 +457,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.prowlarr.rule=Host("prowlarr.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.prowlarr.entrypoint=web
+      - traefik.http.routers.prowlarr.entrypoints=web
 
 
   flaresolverr:

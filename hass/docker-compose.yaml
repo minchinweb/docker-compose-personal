@@ -6,7 +6,7 @@ version: '2.4'
 services:
   # home automation
   homeassistant:
-    image: lscr.io/linuxserver/homeassistant:2024.1.5-ls224  # current
+    image: lscr.io/linuxserver/homeassistant:2024.3.3-ls248  # current
     # hostname: hass
     container_name: hass
     environment:
@@ -71,6 +71,7 @@ services:
       - 3306:3306
     restart: unless-stopped
 
+  # used for SleepAsAndriod integration 
   mosquitto:
     image: eclipse-mosquitto:2
     container_name: mosquitto
