@@ -4,30 +4,84 @@ version: '2.4'
 # in the same directory as this file
 
 services:
-  gitea:
-    image: gitea/gitea:1
-    container_name: gitea
+  # gitea:
+  #   image: gitea/gitea:1
+  #   container_name: gitea
+  #   environment:
+  #     - USER_UID=${PUID}
+  #     - USER_GID=${PGID}
+  #     - GITEA__APP_NAME="Gitea on Chatelet"
+  #     - GITEA__ui.meta__AUTHOR="MinchinWeb"
+  #     - GITEA__ui.meta__DESCRIPTION="Git hosting on Normandie"
+  #     - GITEA__server__HTTP_PORT=${GITEA_PORT}
+  #   restart: unless-stopped
+  #   # networks:
+  #   #   - gitea
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/gitea:/data
+  #     - /etc/timezone:/etc/timezone:ro
+  #     - /etc/localtime:/etc/localtime:ro
+  #   ports:
+  #     - ${GITEA_PORT}:${GITEA_PORT}  # 9993
+  #     - "9992:22"
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.gitea.rule=Host("git.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.services.gitea.loadbalancer.server.port=${GITEA_PORT}  # internal port, when multiple ports are exposed
+
+  forgejo:
+    # defaults to SQLite, but can be configured with a "real" database
+    image: codeberg.org/forgejo/forgejo:1.21
+    container_name: forgejo
     environment:
       - USER_UID=${PUID}
       - USER_GID=${PGID}
-      - GITEA__APP_NAME="Gitea on Chatelet"
-      - GITEA__ui.meta__AUTHOR="MinchinWeb"
-      - GITEA__ui.meta__DESCRIPTION="Git hosting on Normandie"
-      - GITEA__server__HTTP_PORT=${GITEA_PORT}
+      - FORGEJO__database__SQLITE_JOURNAL_MODE=WAL
+      - FORGEJO__APP_NAME=ForgeJo on Normandie
+      - FORGEJO__ui.meta__DESCRIPTION=Git hosting on Normandie
     restart: unless-stopped
     # networks:
-    #   - gitea
+    #   - forgejo
     volumes:
-      - ${DOCKER_USERDIR}/volumes/gitea:/data
+      - ${DOCKER_USERDIR}/volumes/forgejo:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - ${GITEA_PORT}:${GITEA_PORT}  # 9993
-      - "9992:22"
+      - 9982:3000
+      - "9983:22"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.gitea.rule=Host("git.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.services.gitea.loadbalancer.server.port=${GITEA_PORT}  # internal port, when multiple ports are exposed
+      - traefik.http.routers.forgejo.rule=Host("git.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.services.forgejo.loadbalancer.server.port=3000  # internal port, when multiple ports are exposed
+
+  docker-in-docker:
+    image: docker:dind
+    container_name: docker_dind
+    privileged: true
+    command: ['dockerd', '-H', 'tcp://0.0.0.0:2375', '--tls=false']
+    restart: unless-stopped
+
+  forgejo-runner:
+    image: code.forgejo.org/forgejo/runner:3.3.0
+    links:
+      - docker-in-docker
+    depends_on:
+      docker-in-docker:
+        condition: service_started
+    container_name: runner
+    environment:
+      DOCKER_HOST: tcp://docker-in-docker:2375
+    # User without root privileges, but with access to `./data`.
+    user: ${PUID}:${PGID}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/forgejo-runner:/data
+    ports:
+      - 9984:9984
+    restart: 'unless-stopped'
+    # command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'  # while doing manual setup
+    command: '/bin/sh -c "sleep 5; forgejo-runner daemon"'
+
+
 
 
 networks:
