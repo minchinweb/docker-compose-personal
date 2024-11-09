@@ -127,6 +127,18 @@ services:
     networks:
       - proxy  # for access to web UI
 
+  matter:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    hostname: matter
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/matter:/data
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: "192.168.1.193"
+      proxy:
+    # --security-opt apparmor=unconfined \
 
 networks:
   default:
