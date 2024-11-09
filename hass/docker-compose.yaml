@@ -140,6 +140,26 @@ services:
       proxy:
     # --security-opt apparmor=unconfined \
 
+  spoolmam:
+    image: ghcr.io/donkie/spoolman:latest
+    hostname: spoolman
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/spoolmam:/home/app/.local/share/spoolman
+    ports:
+      - '9986:8000'
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.spoolman.rule=Host("spoolman.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.spoolman.entrypoints=web
+    networks:
+      - proxy  # for access to web UI
+
+
 networks:
   default:
     external:
