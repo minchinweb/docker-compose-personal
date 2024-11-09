@@ -137,6 +137,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.cops.rule=Host("cops.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.cops.tls.certresolver=none  # for .lan domain, no ACME challenge
 
   # c.f. https://hub.docker.com/r/linuxserver/calibre
 
@@ -322,72 +323,72 @@ services:
       - traefik.http.middlewares.navidrome-public-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.navidrome-public-to-https.redirectscheme.permanent=true
 
-  # jellyfin:
-  #   # media server to compliment Kodi
-  #   # https://hub.docker.com/r/linuxserver/jellyfin
-  #   image: lscr.io/linuxserver/jellyfin:latest
-  #   container_name: jellyfin
-  #   # user:
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #     # - JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
-  #   ports:
-  #     - 9972:8096
-  #     # - 8920:8920 # optional, HTTPS
-  #     - 7359:7359/udp # optional, LAN auto-discover
-  #     # - 1900:1900/udp # optional, DLNA
-  #   volumes:
-  #     - ${DOCKER_EXTRA_DIR}/jellyfin:/config
-  #     - ${NAS_DIR}/video/Movies:/data/movies:ro
-  #     - "${NAS_DIR}/video/Movies, Kids A:/data/movies-kids-a:ro"
-  #     - "${NAS_DIR}/video/Movies, Kids B:/data/movies-kids-b:ro"
-  #     - "${NAS_DIR}/video/Movies [FR]:/data/movies-fr:ro"
-  #     - "${NAS_DIR}/video/TV Shows:/data/tv-shows:ro"
-  #     - "${NAS_DIR}/video/TV Shows, Kids A:/data/tv-shows-kids-a:ro"
-  #     - "${NAS_DIR}/video/TV Shows, Kids B:/data/tv-shows-kids-b:ro"
-  #     - "${NAS_DIR}/video/TV Shows [FR]:/data/tv-shows-fr:ro"
-  #     - "${NAS_DIR}/video/TV Shows, Fake:/data/tv-shows-fake:ro"
-  #     - ${NAS_DIR}/ebook/calibre:/data/ebooks:ro
-  #     - ${NAS_DIR}/music/Music:/data/music:ro
-  #     - ${NAS_DIR}/music/Audiobooks:/data/audiobooks:ro
-  #   restart: unless-stopped
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.jellyfin.rule=Host("video.${LOCAL_DOMAIN_NAME}")
-  #     - traefik.http.routers.jellyfin.entrypoints=web
-
-  #     - traefik.http.services.jellyfin-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
-  #     - traefik.http.routers.jellyfin.service=jellyfin-service
-
-  #     - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
-  #     - traefik.http.routers.jellyfin-public.service=jellyfin-public-service
-  #     - traefik.http.routers.jellyfin-publicsecure.service=jellyfin-public-service
-
-  #     - traefik.http.routers.jellyfin-public.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
-  #     - traefik.http.routers.jellyfin-public.entrypoints=web
-  #     - traefik.http.routers.jellyfin-public.middlewares=jellyfin-public-to-https
-
-  #     - traefik.http.routers.jellyfin-publicsecure.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
-  #     - traefik.http.routers.jellyfin-publicsecure.entrypoints=websecure
-  #     - traefik.http.routers.jellyfin-publicsecure.tls=true
-  #     - traefik.http.routers.jellyfin-publicsecure.tls.certresolver=myresolver
-      
-  #     - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.scheme=https
-  #     - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.permanent=true
-
-  openbooks:
-    # container_name: openbooks
-    image: evanbuss/openbooks:latest
-    # environment:
-    #   - BASE_PATH=/openbooks/
-    command: --persist --name Patriarch1734
+  jellyfin:
+    # media server to compliment Kodi
+    # https://hub.docker.com/r/linuxserver/jellyfin
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    # user:
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      # - JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
     ports:
-      - 9976:80
+      - 9972:8096
+      # - 8920:8920 # optional, HTTPS
+      - 7359:7359/udp # optional, LAN auto-discover
+      # - 1900:1900/udp # optional, DLNA
     volumes:
-      - ${DOCKER_USERDIR}/volumes/openbooks:/books
+      - ${DOCKER_EXTRA_DIR}/jellyfin:/config
+      - ${NAS_DIR}/video/Movies:/data/movies:ro
+      - "${NAS_DIR}/video/Movies, Kids A:/data/movies-kids-a:ro"
+      - "${NAS_DIR}/video/Movies, Kids B:/data/movies-kids-b:ro"
+      - "${NAS_DIR}/video/Movies [FR]:/data/movies-fr:ro"
+      - "${NAS_DIR}/video/TV Shows:/data/tv-shows:ro"
+      - "${NAS_DIR}/video/TV Shows, Kids A:/data/tv-shows-kids-a:ro"
+      - "${NAS_DIR}/video/TV Shows, Kids B:/data/tv-shows-kids-b:ro"
+      - "${NAS_DIR}/video/TV Shows [FR]:/data/tv-shows-fr:ro"
+      - "${NAS_DIR}/video/TV Shows, Fake:/data/tv-shows-fake:ro"
+      - ${NAS_DIR}/ebook/calibre:/data/ebooks:ro
+      - ${NAS_DIR}/music/Music:/data/music:ro
+      - ${NAS_DIR}/music/Audiobooks:/data/audiobooks:ro
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.rule=Host("video.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.jellyfin.entrypoints=web
+
+      - traefik.http.services.jellyfin-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
+      - traefik.http.routers.jellyfin.service=jellyfin-service
+
+      - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
+      - traefik.http.routers.jellyfin-public.service=jellyfin-public-service
+      - traefik.http.routers.jellyfin-publicsecure.service=jellyfin-public-service
+
+      - traefik.http.routers.jellyfin-public.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.jellyfin-public.entrypoints=web
+      - traefik.http.routers.jellyfin-public.middlewares=jellyfin-public-to-https
+
+      - traefik.http.routers.jellyfin-publicsecure.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.jellyfin-publicsecure.entrypoints=websecure
+      - traefik.http.routers.jellyfin-publicsecure.tls=true
+      - traefik.http.routers.jellyfin-publicsecure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.permanent=true
+
+  # openbooks:
+  #   # container_name: openbooks
+  #   image: evanbuss/openbooks:latest
+  #   # environment:
+  #   #   - BASE_PATH=/openbooks/
+  #   command: --persist --name Patriarch1734
+  #   ports:
+  #     - 9976:80
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/openbooks:/books
+  #   restart: unless-stopped
 
 
   radarr:
