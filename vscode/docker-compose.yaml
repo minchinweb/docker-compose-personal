@@ -45,10 +45,11 @@ services:
       - traefik.http.routers.vscode.entrypoints=web
       - traefik.http.routers.vscode.middlewares=vscode-to-https
 
-      - traefik.http.routers.vscodesecure.rule=Host("code.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.vscodesecure.entrypoints=websecure
-      - traefik.http.routers.vscodesecure.tls=true
-      # - traefik.http.routers.vscodesecure.tls.certresolver=myresolver
+      - traefik.http.routers.vscode-secure.rule=Host("code.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.vscode-secure.entrypoints=websecure
+      - traefik.http.routers.vscode-secure.tls=true
+      # - traefik.http.routers.vscode-secure.tls.certresolver=myresolver
+      # - traefik.http.routers.vscode-secure.tls.certresolver=none  # for .lan domain, no ACME challenge
       
       - traefik.http.middlewares.vscode-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.vscode-to-https.redirectscheme.permanent=true

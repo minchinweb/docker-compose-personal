@@ -156,6 +156,14 @@ services:
       - traefik.enable=true
       - traefik.http.routers.spoolman.rule=Host("spoolman.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.spoolman.entrypoints=web
+      - traefik.http.routers.spoolman.middlewares=spoolman-to-https
+
+      - traefik.http.routers.spoolman-secure.rule=Host("spoolman.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.spoolman-secure.entrypoints=websecure
+      - traefik.http.routers.spoolman-secure.tls=true
+
+      - traefik.http.middlewares.spoolman-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.spoolman-to-https.redirectscheme.permanent=true
     networks:
       - proxy  # for access to web UI
 
