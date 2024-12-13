@@ -265,6 +265,8 @@ services:
       - 9974:80
     volumes:
       - ${NAS_DIR}/music/Audiobooks:/audiobooks:ro
+      # allow writing to Podcast directory, so it can download them
+      - ${NAS_DIR}/home/podcasts:/podcasts
       # - </path/to/podcasts>:/podcasts
       - ${DOCKER_USERDIR}/volumes/audiobookshlef-config:/config
       - ${DOCKER_USERDIR}/volumes/audiobookshlef-metadata:/metadata
