@@ -70,6 +70,8 @@ services:
       # - traefik.providers.docker.exposedByDefault=false
       # - traefik.http.routers.traefik-container.rule=Host("${LOCAL_DOMAIN_NAME}") && PathPrefix("/traefik")  # 2.0
       # - traefik.http.middlewares.traefik-container.stripprefix.prefixes=/traefik
+      # - traefik.http.routers.traefik-container.tls.certresolver=none  # for .lan domain, no ACME challenge
+      # - traefik.http.routers.traefik-container.tls=false  # for .lan domain, no ACME challenge
 
       ## HTTP --> HTTPS redirect
       # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
@@ -123,6 +125,8 @@ services:
       - traefik.http.middlewares.landing-page-to-https.redirectscheme.permanent=true
 
       - traefik.http.routers.landing-page-internal.rule=Host("${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.landing-page-internal.tls.certresolver=none  # for .lan domain, no ACME challenge
+      # - traefik.http.routers.landing-page-internal.tls=false  # for .lan domain, no ACME challenge
 
   jrnl:
     # serve my notes as a pre-rendered static site

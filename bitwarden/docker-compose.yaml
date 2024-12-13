@@ -117,6 +117,9 @@ services:
   #     - ${NAS_DIR}/home/docker/vaultwarden-backup:/backup/
   #   #   - /path/to/env:/.env
 
+# other backup options at https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault
+# including  https://github.com/Bruceforce/vaultwarden-backup
+
 networks:
   default:
     external:

@@ -29,6 +29,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.rt5.rule=Host("rt.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.rt5.tls.certresolver=none  # for .lan domain, no ACME challenge
+      # - traefik.http.routers.rt5.tls=false  # for .lan domain, no ACME challenge
 
 networks:
   default:

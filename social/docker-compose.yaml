@@ -29,6 +29,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.fresh-rss.rule=Host("reader.${LOCAL_DOMAIN_NAME}")
       # - traefik.http.services.fresh-rss.loadbalancer.server.port=80  # internal port, when multiple ports are exposed
+      # - traefik.http.routers.fresh-rss.tls.certresolver=none  # for .lan domain, no ACME challenge
 
 networks:
   default:

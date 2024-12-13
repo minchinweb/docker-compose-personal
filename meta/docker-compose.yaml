@@ -27,6 +27,7 @@ services:
       # doesn't seem to work on path; never connects to Docker deamon
       - traefik.http.routers.portainer.rule=Host("portainer.${LOCAL_DOMAIN_NAME}")
       - traefik.http.services.portainer-service.loadbalancer.server.port=9000
+      # - traefik.http.routers.portainer.tls.certresolver=none  # for .lan domain, no ACME challenge
 
       # docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
 
@@ -65,6 +66,8 @@ services:
       - traefik.enable=true
       - traefik.http.routers.dozzle.rule=Host("dozzle.${LOCAL_DOMAIN_NAME}")
       - traefik.http.routers.dozzle-logs.rule=Host("logs.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.dozzle.tls.certresolver=none  # for .lan domain, no ACME challenge
+      # - traefik.http.routers.dozzle-logs.tls.certresolver=none  # for .lan domain, no ACME challenge
 
   pihole:
     image: pihole/pihole
@@ -106,6 +109,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.pihole.rule=Host("pihole.${LOCAL_DOMAIN_NAME}")
       - traefik.http.services.pihole-service.loadbalancer.server.port=80
+      # - traefik.http.routers.pihole.tls.certresolver=none  # for .lan domain, no ACME challenge
 
   # filezilla:
   #   image: jlesage/filezilla
@@ -190,7 +194,8 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.qdirstat.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}") 
+      - traefik.http.routers.qdirstat.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.qdirstat.tls.certresolver=none  # for .lan domain, no ACME challenge
 
 
   rsnapshot:
