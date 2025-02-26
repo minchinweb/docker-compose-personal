@@ -31,7 +31,7 @@ services:
 
   forgejo:
     # defaults to SQLite, but can be configured with a "real" database
-    image: codeberg.org/forgejo/forgejo:1.21
+    image: codeberg.org/forgejo/forgejo:10
     container_name: forgejo
     environment:
       - USER_UID=${PUID}
