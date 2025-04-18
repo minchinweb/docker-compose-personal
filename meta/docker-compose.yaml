@@ -205,7 +205,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - DOCKER_MODS=linuxserver/mods:universal-docker
+      - DOCKER_MODS=linuxserver/mods:universal-docker|linuxserver/mods:universal-package-install
+      - INSTALL_PACKAGES=sqlite
     volumes:
       # backup from /data to /.snapshots
       - ${DOCKER_USERDIR}/volumes/rsnapshot:/config
@@ -240,6 +241,45 @@ services:
     # sysctls:
     #   - net.ipv4.conf.all.src_valid_mark=1  # Required for client mode
     restart: unless-stopped
+
+  db-backup:
+    # https://github.com/tiredofit/docker-db-backup
+    # Backs up CouchDB, InfluxDB, MySQL/MariaDB, Microsoft SQL, MongoDB, Postgres, Redis servers.
+    image: ghcr.io/tiredofit/docker-db-backup
+    container_name: db_backup
+    environment:
+      - USER_DBBACKUP=${PUID}
+      - GROUP_DBBACKUP=${PGID}
+      - TIMEZONE=${TZ}
+      - CONTAINER_NAME=db_backup
+      - CONTAINER_ENABLE_MONITORING=FALSE
+      - DEFAULT_COMPRESSION=GZ
+      - DEFAULT_GZ_RSYNCABLE=TRUE
+      - DEFAULT_CLEANUP_TIME=14400  # 10 days
+      # - DEBUG_MODE=true
+
+      # Home Assistant
+      - DB01_NAME=homeassistant  # may not matter in backup, but used for backup filename
+      - DB01_TYPE=mariadb
+      - DB01_HOST=hass_db
+      - DB01_USER=root
+      - DB01_PASS=${MYSQL_ROOT_PASSWORD}
+      - DB01_BACKUP_BEGIN=+2
+
+      # Immich
+      - DB02_NAME=immich  # may not matter in backup, but used for backup filename
+      - DB02_TYPE=postgres
+      - DB02_HOST=immich-db
+      - DB02_USER=${IMMICH_DB_USERNAME}
+      - DB02_PASS=${IMMICH_DB_PASSWORD}
+      - DB02_BACKUP_BEGIN=+1
+
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/db-backups:/backup
+    restart: unless-stopped
+    networks:
+      - default
+
 
 networks:
   default:

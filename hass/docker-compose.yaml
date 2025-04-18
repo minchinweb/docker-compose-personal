@@ -54,8 +54,10 @@ services:
       # Home Assistant needs to be on the "proxy" network, as that's the one that Traefik has been set up to listen on
 
   db:
+    # see "meta" stack for database backup
     image: lscr.io/linuxserver/mariadb:latest
     hostname: hass_db
+    container_name: hass_db
     # container_name: mariadb
     environment:
       - PUID=${PUID}
@@ -65,11 +67,15 @@ services:
       - MYSQL_DATABASE=homeassistant
       - MYSQL_USER=homeassistant
       - MYSQL_PASSWORD=${MYSQL_USER_PASSWORD}
+      # - DOCKER_MODS=linuxserver/mods:universal-cron  # used for backup
     volumes:
       - ${DOCKER_USERDIR}/volumes/homeassistant-db:/config
+      # - ${DOCKER_USERDIR}/volumes/homeassistant-db-backups:/backup
     ports:
       - 3306:3306
     restart: unless-stopped
+    networks:
+      - proxy
 
   # used for SleepAsAndriod integration 
   mosquitto:
