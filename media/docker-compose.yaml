@@ -594,6 +594,51 @@ services:
       # - traefik.http.routers.unpackerr.rule=Host("unpackerr.${LOCAL_DOMAIN_NAME}")
       # - traefik.http.routers.unpackerr.entrypoints=web
 
+  # provides local trailers for movies (and TV shows?)
+  # default login: admin/trailarr
+  trailarr:
+    container_name: trailarr
+    # image: nandyalu/trailarr:latest
+    image: nandyalu/trailarr:nightly
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/trailarr:/config
+      - ${NAS_DIR}/video/TV Shows:/video/TV Shows
+      - "${NAS_DIR}/video/TV Shows [FR]:/video/TV Shows [FR]"
+      - "${NAS_DIR}/video/TV Shows, Kids A:/video/TV Shows, Kids A"
+      - "${NAS_DIR}/video/TV Shows, Kids B:/video/TV Shows, Kids B"
+      - ${NAS_DIR}/video/Movies:/video/Movies
+      - "${NAS_DIR}/video/Movies [FR]:/video/Movies [FR]"
+      - "${NAS_DIR}/video/Movies, Kids A:/video/Movies, Kids A"
+      - "${NAS_DIR}/video/Movies, Kids B:/video/Movies, Kids B"
+    ports:
+      - 7889:7889
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.trailarr.rule=Host("trailarr.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.trailarr.entrypoints=web
+
+  jellyseerr:
+    # fork of Overseerr to allow for requests
+    container_name: jellyseerr
+    image: fallenbagel/jellyseerr:latest
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/jellyseerr:/app/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyseerr.rule=Host("jellyseerr.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.jellyseerr.entrypoints=web
+
 
   # PhotoPrism -- photo sorter with face and subject recongition
   # suggests minimum 2 cores and 4GB of memory
