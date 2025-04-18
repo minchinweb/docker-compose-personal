@@ -1,4 +1,4 @@
-version: '2.4'
+#version: '2.4'
 
 # environmental variables *for Docker Compose* will be loaded from a `.env` file
 # in the same directory as this file
@@ -188,5 +188,5 @@ services:
 
 networks:
   default:
-    external:
       name: meta_external
+    external: true
