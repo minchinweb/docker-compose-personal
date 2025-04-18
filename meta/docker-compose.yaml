@@ -71,6 +71,7 @@ services:
 
   pihole:
     image: pihole/pihole
+    container_name: pihole_194
     restart: unless-stopped
     # ports:
     #   - "53:53/tcp"

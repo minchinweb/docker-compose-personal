@@ -90,7 +90,7 @@ services:
 
       ## Export states to Grafana
       # https://theorangeone.net/posts/traefik-influx-metrics/
-              
+
   traefik-certs-dumper:
     # allows the certificates to be used by other services
     # may need to update when I bump Traefik to v3
@@ -192,8 +192,30 @@ services:
       # - traefik.http.routers.jrnl-internal.tls=false  # for .lan domain, no ACME challenge
 
 
+  # baffinisland-redirect:
+  #   image: traefik/whoami  # tiny image, so that labels can be applied
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+
+  #     - traefik.http.routers.baffinisland.rule=Host("${BAFFINISLAND_PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.baffinisland.entrypoints=web
+  #     - traefik.http.routers.baffinisland.service=baffinisland-forwarder
+
+  #     - traefik.http.routers.baffinisland-secure.rule=Host("${BAFFINISLAND_PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.baffinisland-secure.entrypoints=websecure
+  #     # - traefik.http.routers.baffinisland-secure.tls=true
+  #     # - traefik.http.routers.baffinisland-secure.tls.certresolver=myresolver
+  #     - traefik.http.routers.baffinisland-secure.service=baffinisland-forwarder
+
+  #     - traefik.http.routers.baffinisland-local.rule=Host("baffinisland.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.baffinisland-local.entrypoints=web
+  #     - traefik.http.routers.baffinisland-local.service=baffinisland-forwarder
+
+  #     - traefik.http.services.baffinisland-forwarder.loadbalancer.servers.address="${BAFFINISLAND_PRIVATE_IP}"
+  #     - traefik.http.services.baffinisland-forwarder.loadbalancer.servers.url="http://baffinisland.lan"
 
 networks:
   default:
-      name: meta_external
+    name: meta_external
     external: true

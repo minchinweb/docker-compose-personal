@@ -3,6 +3,9 @@
 # environmental variables *for Docker Compose* will be loaded from a `.env` file
 # in the same directory as this file
 
+# Track flights
+# https://github.com/johanohly/AirTrail/
+
 services:
   fresh-rss:
     # Access the webui set up wizard at http://serverIP:port
@@ -31,7 +34,10 @@ services:
       # - traefik.http.services.fresh-rss.loadbalancer.server.port=80  # internal port, when multiple ports are exposed
       # - traefik.http.routers.fresh-rss.tls.certresolver=none  # for .lan domain, no ACME challenge
 
+# Obsidian Sync, via CouchDB
+# https://blog.parthshah.org/a-simple-guide-to-setting-up-self-hosted-livesync-for-obsidian/
+
 networks:
   default:
     external: true
-      name: meta_external
+    name: meta_external

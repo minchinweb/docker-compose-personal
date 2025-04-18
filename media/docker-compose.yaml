@@ -3,6 +3,14 @@
 # environmental variables *for Docker Compose* will be loaded from a `.env` file
 # in the same directory as this file
 
+## Arrchive??
+# backup databases to Google Files
+# https://github.com/EthanC/Arrchive
+
+## Profilarr
+# Configuration management
+# https://github.com/Dictionarry-Hub/profilarr
+
 services:
   # media
   qbittorrent:
@@ -268,8 +276,8 @@ services:
       # allow writing to Podcast directory, so it can download them
       - ${NAS_DIR}/home/podcasts:/podcasts
       # - </path/to/podcasts>:/podcasts
-      - ${DOCKER_USERDIR}/volumes/audiobookshlef-config:/config
-      - ${DOCKER_USERDIR}/volumes/audiobookshlef-metadata:/metadata
+      - ${DOCKER_USERDIR}/volumes/audiobookshelf-config:/config
+      - ${DOCKER_USERDIR}/volumes/audiobookshelf-metadata:/metadata
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -347,7 +355,7 @@ services:
       - 7359:7359/udp # optional, LAN auto-discover
       # - 1900:1900/udp # optional, DLNA
     volumes:
-      - ${DOCKER_EXTRA_DIR}/jellyfin:/config
+      - ${DOCKER_EXTRA_2_DIR}/jellyfin:/config
       - ${NAS_DIR}/video/Movies:/data/movies:ro
       - "${NAS_DIR}/video/Movies, Kids A:/data/movies-kids-a:ro"
       - "${NAS_DIR}/video/Movies, Kids B:/data/movies-kids-b:ro"
@@ -647,6 +655,7 @@ services:
 
 
   # immich -- photo management, gallary, and mobile backup target
+  # (see possible additional items at the bottom)
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
@@ -670,7 +679,7 @@ services:
       # - ${UPLOAD_LOCATION}:/usr/src/app/upload
       # - ${DOCKER_EXTRA_DIR}/immich-uploads:/usr/src/app/upload
       # - ${NAS_DIR}/photo/_immich-photos:/usr/src/app/upload:rw
-      - ${NAS_DIR}/home/_immich-photos:/usr/src/app/upload:rw
+      - ${NAS_DIR}/home/immich-photos:/usr/src/app/upload:rw
       - ${NAS_DIR}/photo:/mnt/photo:ro
       - "${NAS_DIR}/video/TV Shows, Take/Home Videos (2015):/mnt/video/family-videos:ro"
       - /etc/localtime:/etc/localtime:ro
@@ -791,6 +800,16 @@ services:
       - 9992:3000
     restart: unless-stopped
 
+  # immich-folder-album-creator
+  # Creates Albums based on your folder structure
+  # https://github.com/Salvoxia/immich-folder-album-creator
+
+  # immich-duplicate-finder
+  # Find Duplicate photos within Immich
+  # https://github.com/vale46n1/immich_duplicate_finder
+
+  # selfie timelapse
+  # https://github.com/ArnaudCrl/immich-automated-selfie-timelapse
 
 networks:
   default:

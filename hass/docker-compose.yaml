@@ -136,6 +136,7 @@ services:
   matter:
     image: ghcr.io/home-assistant-libs/python-matter-server:stable
     hostname: matter
+    container_name: hass_matter
     volumes:
       - ${DOCKER_USERDIR}/volumes/matter:/data
       - /run/dbus:/run/dbus:ro
@@ -146,15 +147,16 @@ services:
       proxy:
     # --security-opt apparmor=unconfined \
 
-  spoolmam:
+  spoolman:
     image: ghcr.io/donkie/spoolman:latest
     hostname: spoolman
+    container_name: spoolman
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${DOCKER_USERDIR}/volumes/spoolmam:/home/app/.local/share/spoolman
+      - ${DOCKER_USERDIR}/volumes/spoolman:/home/app/.local/share/spoolman
     ports:
       - '9986:8000'
     restart: unless-stopped
@@ -176,8 +178,8 @@ services:
 
 networks:
   default:
-      name: meta_vlan
+    name: meta_vlan
     external: true
   proxy:
-      name: meta_external
+    name: meta_external
     external: true
