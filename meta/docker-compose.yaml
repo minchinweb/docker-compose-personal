@@ -31,22 +31,22 @@ services:
 
       # docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
 
-  watchtower:
-    # Watchtower - Automatic Update of Containers/Apps
-    #
-    # no UI, but possible to get notifications on updates via email or Slack
-    # configure through ENV section
-    image: v2tec/watchtower
-    # container_name: watchtower
-    hostname: watchtower
-    command: --schedule "0 0 4 * * *" --cleanup
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - traefik.enable=false
-    # networks:
-    #   external:
+  # watchtower:
+  #   # Watchtower - Automatic Update of Containers/Apps
+  #   #
+  #   # no UI, but possible to get notifications on updates via email or Slack
+  #   # configure through ENV section
+  #   image: v2tec/watchtower
+  #   # container_name: watchtower
+  #   hostname: watchtower
+  #   command: --schedule "0 0 4 * * *" --cleanup
+  #   restart: always
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   labels:
+  #     - traefik.enable=false
+  #   # networks:
+  #   #   external:
 
   dozzle:
     # Dozzle - Real-time Docker Log Viewer
