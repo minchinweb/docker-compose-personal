@@ -28,6 +28,11 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.forwardedheaders.trustedips=192.168.1.1
       - --entrypoints.websecure.http.tls.certresolver=myresolver
+      # - --entrypoints.irc.address=:6667
+      # - --entrypoints.irc.forwardedheaders.trustedips=192.168.1.1
+      # - --entrypoints.ircsecure.address=:6697
+      # - --entrypoints.ircsecure.forwardedheaders.trustedips=192.168.1.1
+      # - --entrypoints.ircsecure.http.tls.certresolver=myresolver
       # - --entrypoints.minecraft.address=:19132
 
       # HTTPS Certificate
@@ -79,6 +84,22 @@ services:
       ## Export states to Grafana
       # https://theorangeone.net/posts/traefik-influx-metrics/
               
+  traefik-certs-dumper:
+    # allows the certificates to be used by other services
+    # may need to update when I bump Traefik to v3
+    image: ldez/traefik-certs-dumper:v2.10.0
+    user: ${PUID}:${PGID}
+    entrypoint: sh -c '
+      while ! [ -e /data/acme/acme.json ]
+      || ! [ `jq ".[] | .Certificates | length" /data/accme/acme.json | jq -s "add" ` != 0 ]; do
+      sleep 1
+      ; done
+      && traefik-certs-dumper file --version v2 --watch
+      --source /data/acme/acme.json --dest /data/shared/certs'
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/traefik/acme:/data/acme:ro
+      - ${DOCKER_USERDIR}/volumes/shared:/data/shared
+
   fail2ban:
     image: crazymax/fail2ban:latest
     container_name: fail2ban

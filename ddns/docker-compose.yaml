@@ -186,7 +186,24 @@ services:
     labels:
       - traefik.enable=false   
 
+
+  ddns-thelounge:
+    image: ghcr.io/minchinweb/ddns
+    container_name: ddns_chat.${PUBLIC_DOMAIN_NAME}
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DDNS_DOMAIN_NAME=chat.${PUBLIC_DOMAIN_NAME}
+      - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+      - DDNS_KEY=${DDNS_KEY_CHAT}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=false  
+
+
 networks:
   default:
-      name: meta_external
+    name: meta_external
     external: true

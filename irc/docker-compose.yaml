@@ -3,37 +3,84 @@
 # environmental variables *for Docker Compose* will be loaded from a `.env` file
 # in the same directory as this file
 
+
+## Traefik Configuration?
+# https://gist.github.com/baranelitez/fa260f0749c01248c18acd4e25b2bde1
+
+## Webchat??
+# gamja -- https://codeberg.org/emersion/gamja
+
 services:
-  ngircd:
-    image: lscr.io/linuxserver/ngircd
-    container_name: ngircd
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+  # ngircd:
+  #   # this is the actual IRC server
+  #   image: lscr.io/linuxserver/ngircd
+  #   container_name: ngircd
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/ngircd:/config
+  #   ports:
+  #     - 6667:6667
+  #   restart: unless-stopped
+
+  ergo:
+    image: ghcr.io/ergochat/ergo:stable
+    container_name: ergo
+    hostname: irc
+    user: ${PUID}:${PGID}
     volumes:
-      - ${DOCKER_USERDIR}/volumes/ngircd:/config
+      - ${DOCKER_USERDIR}/volumes/ergo:/ircd
+      - ${DOCKER_USERDIR}/volumes/shared/certs:/mnt/certs:ro
     ports:
+      # - 9994:6667
+      # - 9995:6697
       - 6667:6667
+      - 6697:6697
+      # - 8097:8097  # websocket
+    labels:
+      - traefik.enable=false  # turn off routing and connect directly
+
+      # - traefik.enable=true
+      - traefik.tcp.routers.ergo.rule=HostSNI("${PUBLIC_DOMAIN_NAME}")
+      - traefik.tcp.routers.ergo.entrypoints=irc
+      - traefik.tcp.routers.ergo.service=ergo-service
+      # - traefik.tcp.routers.ergo.middlewares=ergo-to-ircsecure
+      - traefik.tcp.services.ergo-service.loadbalancer.server.port=6667  # internal port, when multiple ports are exposed
+      
+      - traefik.tcp.routers.ergo-secure.rule=HostSNI("${PUBLIC_DOMAIN_NAME}")
+      - traefik.tcp.routers.ergo-secure.entrypoints=ircsecure
+      - traefik.tcp.routers.ergo-secure.service=ergo-secure-service
+      - traefik.tcp.routers.ergo-secure.tls=true
+      - traefik.tcp.routers.ergo-secure.tls.certresolver=myresolver
+      - traefik.tcp.routers.ergo-secure.options=ircsecure
+      - traefik.tcp.services.ergo-secure-service.loadbalancer.server.port=6697  # internal port, when multiple ports are exposed
+      
+      # - traefik.tcp.middlewares.ergo-to-ircsecure.redirectscheme.scheme=https
+      # - traefik.tcp.middlewares.ergo-to-ircsecure.redirectscheme.permanent=true
+
+      - traefik.tcp.routers.ergo-internal.rule=HostSNI("${LOCAL_DOMAIN_NAME}")
+      - traefik.tcp.routers.ergo.service=ergo-service
     restart: unless-stopped
 
-  quassel-core:
-    image: lscr.io/linuxserver/quassel-core
-    container_name: quassel-core
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - RUN_OPTS=--config-from-environment  # run the first time without...
-      - DB_BACKEND=SQLite
-      - AUTH_AUTHENTICATOR=Database
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/quassel-core:/config
-    ports:
-      - 9958:4242
-      - 113:10113  # optional, ident server
-    restart: unless-stopped
-    # can use a PostreSQL database...
+  # quassel-core:
+  #   image: lscr.io/linuxserver/quassel-core
+  #   container_name: quassel-core
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - RUN_OPTS=--config-from-environment  # run the first time without...
+  #     - DB_BACKEND=SQLite
+  #     - AUTH_AUTHENTICATOR=Database
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/quassel-core:/config
+  #   ports:
+  #     - 9958:4242
+  #     - 113:10113  # optional, ident server
+  #   restart: unless-stopped
+  #   # can use a PostreSQL database...
 
   thelounge:
     image: lscr.io/linuxserver/thelounge
@@ -46,7 +93,24 @@ services:
       - ${DOCKER_USERDIR}/volumes/thelounge:/config
     ports:
       - 9960:9000
+    labels:
+      - traefik.enable=true
+      
+      - traefik.http.routers.thelounge.rule=Host("chat.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.thelounge.entrypoints=web
+      - traefik.http.routers.thelounge.middlewares=thelounge-to-https
+      
+      - traefik.http.routers.thelounge-secure.rule=Host("chat.${PUBLIC_DOMAIN_NAME}")
+      - traefik.http.routers.thelounge-secure.entrypoints=websecure
+      - traefik.http.routers.thelounge-secure.tls=true
+      - traefik.http.routers.thelounge-secure.tls.certresolver=myresolver
+      
+      - traefik.http.middlewares.thelounge-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.thelounge-to-https.redirectscheme.permanent=true
+
+      - traefik.http.routers.thelounge-internal.rule=Host("chat.${LOCAL_DOMAIN_NAME}")
     restart: unless-stopped
+
 
 networks:
   default:
