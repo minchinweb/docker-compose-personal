@@ -648,6 +648,24 @@ services:
       - traefik.http.routers.jellyseerr.entrypoints=web
 
 
+  cross-seed:
+    # automatically cross-seed torrents between (private) trackers
+    image: ghcr.io/cross-seed/cross-seed:6
+    container_name: cross-seed
+    hostname: cross-seed
+    user: ${PUID}:${PGID} # this must match your torrent client (cross-seed does not support using PGID and PUID)
+    ports:
+      - 2468:2468
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/cross-seed:/config
+      - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive
+      #- # You will need at least one extra volume for your media drive if using https://www.cross-seed.org/docs/tutorials/linking
+    command: daemon
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cross-seed.rule=Host("cross-seed.${LOCAL_DOMAIN_NAME}")
+
   # PhotoPrism -- photo sorter with face and subject recongition
   # suggests minimum 2 cores and 4GB of memory
   # https://github.com/photoprism/photoprism
