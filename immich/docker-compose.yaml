@@ -1,0 +1,151 @@
+# environmental variables *for Docker Compose* will be loaded from a `.env` file
+# in the same directory as this file
+
+services:
+  # immich -- photo management, gallary, and mobile backup target
+  # (see possible additional items at the bottom)
+  immich-server:
+    container_name: immich-server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    hostname: immich
+    environment:
+      # https://immich.app/docs/install/environment-variables/
+      # - UPLOAD_LOCATION=${IMMICH_UPLOAD_LOCATION}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DB_HOSTNAME=immich-db
+      - DB_USERNAME=${IMMICH_DB_USERNAME}
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
+      - DB_DATABASE_NAME=${IMMICH_DB_DATABASE_NAME}
+      - REDIS_HOSTNAME=immich-redis
+    volumes:
+      # # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
+      # - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      # - ${DOCKER_EXTRA_DIR}/immich-uploads:/usr/src/app/upload
+      # - ${NAS_DIR}/photo/_immich-photos:/usr/src/app/upload:rw
+      - ${NAS_DIR}/home/immich-photos:/usr/src/app/upload:rw
+      # to ensure access to latest photos, go to Synology Photo Station --> Settings --> User Accounts --> docker
+      - ${NAS_DIR}/photo:/mnt/photo:ro
+      - "${NAS_DIR}/video/TV Shows, Take/Home Videos (2015):/mnt/video/family-videos:ro"
+      - /etc/localtime:/etc/localtime:ro
+    # env_file:
+    #   - .env
+    ports:
+      - '9988:2283'
+    depends_on:
+      - immich-redis
+      - immich-db
+    restart: unless-stopped
+    labels:
+      # - traefik.enable=false
+      - traefik.enable=true
+      - traefik.http.routers.immich.rule=Host("immich.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.immich.entrypoints=web
+      # - traefik.http.routers.immich.middlewares=immich-to-https
+
+      # - traefik.http.routers.immich-secure.rule=Host("immich.${LOCAL_DOMAIN_NAME}")
+      # - traefik.http.routers.immich-secure.entrypoints=websecure
+      # - traefik.http.routers.immich-secure.tls=true
+      # # - traefik.http.routers.immich-secure.tls.certresolver=myresolver
+      # # - traefik.http.routers.immich-secure.tls.certresolver=none  # for .lan domain, no ACME challenge
+      
+      # - traefik.http.middlewares.immich-to-https.redirectscheme.scheme=https
+      # - traefik.http.middlewares.immich-to-https.redirectscheme.permanent=true
+    healthcheck:
+      disable: false
+
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    # For hardware acceleration, add one of -[armnn, cuda, rocm, openvino, rknn] to the image tag.
+    # Example tag: ${IMMICH_VERSION:-release}-cuda
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+    #   file: hwaccel.ml.yml
+    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    environment:
+      # - UPLOAD_LOCATION=${IMMICH_UPLOAD_LOCATION}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      # - MACHINE_LEARNING_MODEL_TTL=300  # default is 300 seconds
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/immich-model-cache:/cache
+    # env_file:
+    #   - .env
+    restart: unless-stopped
+    healthcheck:
+      disable: false
+
+  immich-redis:
+    container_name: immich-redis
+    image: docker.io/valkey/valkey:8-bookworm@sha256:ff21bc0f8194dc9c105b769aeabf9585fea6a8ed649c0781caeac5cb3c247884
+    hostname: immich-redis
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: unless-stopped
+
+  immich-db:
+    container_name: immich-postgres
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0
+    hostname: immich-db
+    environment:
+      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
+      - POSTGRES_USER=${IMMICH_DB_USERNAME}
+      - POSTGRES_DB=${IMMICH_DB_DATABASE_NAME}
+      - POSTGRES_INITDB_ARGS='--data-checksums'
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
+      - DB_STORAGE_TYPE=HDD
+    volumes:
+      # # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
+      # - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+      - ${DOCKER_USERDIR}/volumes/immich-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  immich-power-tools:
+    container_name: immich-power-tools
+    image: ghcr.io/varun-raj/immich-power-tools:latest
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DB_HOST=immich-db
+      - DB_USERNAME=${IMMICH_DB_USERNAME}
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
+      - DB_DATABASE_NAME=${IMMICH_DB_DATABASE_NAME}
+      - IMMICH_API_KEY=${IMMICH_API_KEY}
+      - IMMICH_URL=${IMMICH_URL_INTERNAL}
+      - EXTERNAL_IMMICH_URL=${IMMICH_URL_INTERNAL}
+    ports:
+      - 9992:3000
+    restart: unless-stopped
+
+  # immich-folder-album-creator
+  # Creates Albums based on your folder structure
+  # https://github.com/Salvoxia/immich-folder-album-creator
+
+  # immich-duplicate-finder
+  # Find Duplicate photos within Immich
+  # https://github.com/vale46n1/immich_duplicate_finder
+
+  # selfie timelapse
+  # https://github.com/ArnaudCrl/immich-automated-selfie-timelapse
+
+  # PhotoPrism -- photo sorter with face and subject recongition
+  # suggests minimum 2 cores and 4GB of memory
+  # https://github.com/photoprism/photoprism
+
+networks:
+  default:
+    external: true
+    name: meta_external
