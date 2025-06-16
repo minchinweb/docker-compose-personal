@@ -1,4 +1,4 @@
-version: '2.4'
+# version: '2.4'
 
 # environmental variables *for Docker Compose* will be loaded from a `.env` file
 # in the same directory as this file
@@ -285,7 +285,9 @@ services:
 networks:
   default:
     name: meta_external
+    enable_ipv6: true
   vlan:
+    name: meta_vlan
     driver: macvlan
     driver_opts:
       parent: ${NETWORK_INTERFACE}
