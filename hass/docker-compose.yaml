@@ -6,7 +6,7 @@
 services:
   # home automation
   homeassistant:
-    image: lscr.io/linuxserver/homeassistant:2025.6.1-ls112
+    image: lscr.io/linuxserver/homeassistant:2025.7.4-ls126
     # hostname: hass
     container_name: hass
     environment:
@@ -101,7 +101,7 @@ services:
       - proxy
 
   zwave-js-ui:
-    image: zwavejs/zwave-js-ui:9
+    image: zwavejs/zwave-js-ui:latest
     container_name: zwave-js-ui
     hostname: zwave
     environment:
