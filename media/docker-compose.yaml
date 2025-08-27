@@ -418,6 +418,7 @@ services:
       - "${NAS_DIR}/video/Movies [FR]:/video/Movies [FR]"
       - "${NAS_DIR}/video/Movies, Kids A:/video/Movies, Kids A"
       - "${NAS_DIR}/video/Movies, Kids B:/video/Movies, Kids B"
+      - "${NAS_DIR}/video/Movies, Kids C:/video/Movies, Kids C"
       - "${NAS_DIR}/video/_import/movies:/video/_import/movies"  # unsorted, downloaded elsewhere
       - "${NAS_DIR}/video/_duplicates:/video/_duplicates"  # "trash"
       - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive; match qbittorrent
@@ -443,6 +444,7 @@ services:
       - "${NAS_DIR}/video/TV Shows [FR]:/video/TV Shows [FR]"
       - "${NAS_DIR}/video/TV Shows, Kids A:/video/TV Shows, Kids A"
       - "${NAS_DIR}/video/TV Shows, Kids B:/video/TV Shows, Kids B"
+      - "${NAS_DIR}/video/TV Shows, Kids C:/video/TV Shows, Kids C"
       - "${NAS_DIR}/video/_import/tv:/video/_import/tv"  # unsorted, downloaded elsewhere
       - "${NAS_DIR}/video/_duplicates:/video/_duplicates"  # "trash"
       - ${DOCKER_EXTRA_DIR}/qbittorrent/downloads:/downloads  # 'E' drive; match qbittorrent
@@ -616,10 +618,12 @@ services:
       - "${NAS_DIR}/video/TV Shows [FR]:/video/TV Shows [FR]"
       - "${NAS_DIR}/video/TV Shows, Kids A:/video/TV Shows, Kids A"
       - "${NAS_DIR}/video/TV Shows, Kids B:/video/TV Shows, Kids B"
+      - "${NAS_DIR}/video/TV Shows, Kids C:/video/TV Shows, Kids C"
       - ${NAS_DIR}/video/Movies:/video/Movies
       - "${NAS_DIR}/video/Movies [FR]:/video/Movies [FR]"
       - "${NAS_DIR}/video/Movies, Kids A:/video/Movies, Kids A"
       - "${NAS_DIR}/video/Movies, Kids B:/video/Movies, Kids B"
+      - "${NAS_DIR}/video/Movies, Kids C:/video/Movies, Kids C"
     ports:
       - 7889:7889
     restart: unless-stopped
