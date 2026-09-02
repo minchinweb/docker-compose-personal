@@ -9,7 +9,7 @@
 services:
   # home automation
   homeassistant:
-    image: lscr.io/linuxserver/homeassistant:2026.7.0-ls226
+    image: lscr.io/linuxserver/homeassistant:2026.9.0-ls244
     # hostname: hass
     container_name: hass
     environment:
