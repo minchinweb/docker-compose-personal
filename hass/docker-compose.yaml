@@ -9,7 +9,7 @@
 services:
   # home automation
   homeassistant:
-    image: lscr.io/linuxserver/homeassistant:2026.9.0-ls244
+    image: lscr.io/linuxserver/homeassistant:2026.9.4-ls251
     # hostname: hass
     container_name: hass
     environment:
@@ -146,10 +146,10 @@ services:
       - proxy  # for access to web UI
 
   matter:
-    # image: ghcr.io/home-assistant-libs/python-matter-server:stable
-    image: ghcr.io/matter-js/python-matter-server:stable
+    image: ghcr.io/matter-js/matterjs-server:stable
     hostname: matter
     container_name: hass_matter
+    user: ${PUID}:${PGID}
     volumes:
       - ${DOCKER_USERDIR}/volumes/matter:/data
       # Required for Bluetooth via D-Bus
