@@ -85,7 +85,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
     labels:
-      - traefik.ena
+      - traefik.enable=false
 
   ddns-calibre-web:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
@@ -169,7 +169,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
     labels:
-      - traefik.enable=false   
+      - traefik.enable=false
 
   ddns-home-assistant:
     image: ghcr.io/minchinweb/ddns
@@ -184,8 +184,22 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
     labels:
-      - traefik.enable=false   
+      - traefik.enable=false
 
+  # ddns-home-assistant-logs:
+  #   image: ghcr.io/minchinweb/ddns
+  #   container_name: ddns_hass_logs.${PUBLIC_DOMAIN_NAME}
+  #   restart: unless-stopped
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - DDNS_DOMAIN_NAME=logs.ha.${PUBLIC_DOMAIN_NAME}
+  #     - DDNS_UPDATE_URL=${DDNS_UPDATE_URL}
+  #     - DDNS_KEY=${DDNS_KEY_HASS_MCP_LOGS}
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #   labels:
+  #     - traefik.enable=false
 
   ddns-thelounge:
     image: ghcr.io/minchinweb/ddns
