@@ -10,6 +10,8 @@
 ## Webchat??
 # gamja -- https://codeberg.org/emersion/gamja
 
+## XMPP as alternate? -- https://blog.dmcc.io/journal/xmpp-turn-stun-coturn-prosody/
+
 services:
   # ngircd:
   #   # this is the actual IRC server
