@@ -191,6 +191,34 @@ services:
     networks:
       - proxy  # for access to web UI
 
+  hass-mcp-logs:
+    build: ../../build/hass-mcp-logs
+    container_name: hass-mcp-logs
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - HA_URL=http://hass:8123
+      - HA_TOKEN=${HASS_MCP_LOGS_HA_TOKEN}
+      - MCP_AUTH_TOKEN=${HASS_MCP_LOGS_MCP_TOKEN}
+      - MCP_PATH=${HASS_MCP_LOGS_MCP_PATH}
+    restart: unless-stopped
+    ports:
+      - 9806:8000
+    labels:
+      - traefik.enable=false
+      # - traefik.http.services.hass-mcp-logs.loadbalancer.server.port=8000
+      # - traefik.http.routers.hass-mcp-logs.rule=Host("logs.ha.${PUBLIC_DOMAIN_NAME}")
+      # - traefik.http.routers.hass-mcp-logs.entrypoints=websecure
+      # - traefik.http.routers.hass-mcp-logs.tls=true
+      # - traefik.http.routers.hass-mcp-log.tls.certresolver=myresolver
+    depends_on:
+      - homeassistant
+    links:
+      - homeassistant
+    networks:
+      - proxy
+
 
 networks:
   default:
