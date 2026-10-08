@@ -9,6 +9,11 @@
 # Configuration management
 # https://github.com/Dictionarry-Hub/profilarr
 
+## Read Me a Book
+# Search and Downloaded for audiobooks
+# https://github.com/kikootwo/ReadMeABook
+# Docker-Compose Stack -- https://github.com/hematic/readmeabook_stack
+
 services:
   # media
   qbittorrent:
@@ -299,6 +304,10 @@ services:
     #   timeout: "10s"
     #   retries: 4
 
+  # AudioMuse-AI -- sonic analysis
+  # https://github.com/NeptuneHub/AudioMuse-AI
+  # https://github.com/NeptuneHub/AudioMuse-AI-NV-plugin
+
   navidrome:
     # backup is on crony stack
     image: deluan/navidrome:latest
@@ -306,7 +315,6 @@ services:
     user: ${PUID}:${PGID}  # should be owner of volumes
     environment:
       - TZ=${TZ}
-      # Optional: put your config options customization here. Examples:
       - ND_SCANSCHEDULE=15m
       - ND_LOGLEVEL=info  
       - ND_SESSIONTIMEOUT=24h
@@ -336,60 +344,60 @@ services:
       - traefik.http.middlewares.navidrome-public-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.navidrome-public-to-https.redirectscheme.permanent=true
 
-  jellyfin:
-    # media server to compliment Kodi
-    # https://hub.docker.com/r/linuxserver/jellyfin
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    # user:
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      # - JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
-    ports:
-      - 9972:8096
-      # - 8920:8920 # optional, HTTPS
-      - 7359:7359/udp # optional, LAN auto-discover
-      # - 1900:1900/udp # optional, DLNA
-    volumes:
-      - ${DOCKER_EXTRA_2_DIR}/jellyfin:/config
-      - ${NAS_DIR}/video/Movies:/data/movies:ro
-      - "${NAS_DIR}/video/Movies, Kids A:/data/movies-kids-a:ro"
-      - "${NAS_DIR}/video/Movies, Kids B:/data/movies-kids-b:ro"
-      - "${NAS_DIR}/video/Movies [FR]:/data/movies-fr:ro"
-      - "${NAS_DIR}/video/TV Shows:/data/tv-shows:ro"
-      - "${NAS_DIR}/video/TV Shows, Kids A:/data/tv-shows-kids-a:ro"
-      - "${NAS_DIR}/video/TV Shows, Kids B:/data/tv-shows-kids-b:ro"
-      - "${NAS_DIR}/video/TV Shows [FR]:/data/tv-shows-fr:ro"
-      - "${NAS_DIR}/video/TV Shows, Fake:/data/tv-shows-fake:ro"
-      - ${NAS_DIR}/ebook/calibre:/data/ebooks:ro
-      - ${NAS_DIR}/music/Music:/data/music:ro
-      - ${NAS_DIR}/music/Audiobooks:/data/audiobooks:ro
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.jellyfin.rule=Host("video.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.jellyfin.entrypoints=web
+  # jellyfin:
+  #   # media server to compliment Kodi
+  #   # https://hub.docker.com/r/linuxserver/jellyfin
+  #   image: lscr.io/linuxserver/jellyfin:latest
+  #   container_name: jellyfin
+  #   # user:
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     # - JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
+  #   ports:
+  #     - 9972:8096
+  #     # - 8920:8920 # optional, HTTPS
+  #     - 7359:7359/udp # optional, LAN auto-discover
+  #     # - 1900:1900/udp # optional, DLNA
+  #   volumes:
+  #     - ${DOCKER_EXTRA_2_DIR}/jellyfin:/config
+  #     - ${NAS_DIR}/video/Movies:/data/movies:ro
+  #     - "${NAS_DIR}/video/Movies, Kids A:/data/movies-kids-a:ro"
+  #     - "${NAS_DIR}/video/Movies, Kids B:/data/movies-kids-b:ro"
+  #     - "${NAS_DIR}/video/Movies [FR]:/data/movies-fr:ro"
+  #     - "${NAS_DIR}/video/TV Shows:/data/tv-shows:ro"
+  #     - "${NAS_DIR}/video/TV Shows, Kids A:/data/tv-shows-kids-a:ro"
+  #     - "${NAS_DIR}/video/TV Shows, Kids B:/data/tv-shows-kids-b:ro"
+  #     - "${NAS_DIR}/video/TV Shows [FR]:/data/tv-shows-fr:ro"
+  #     - "${NAS_DIR}/video/TV Shows, Fake:/data/tv-shows-fake:ro"
+  #     - ${NAS_DIR}/ebook/calibre:/data/ebooks:ro
+  #     - ${NAS_DIR}/music/Music:/data/music:ro
+  #     - ${NAS_DIR}/music/Audiobooks:/data/audiobooks:ro
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.jellyfin.rule=Host("video.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.jellyfin.entrypoints=web
 
-      - traefik.http.services.jellyfin-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
-      - traefik.http.routers.jellyfin.service=jellyfin-service
+  #     - traefik.http.services.jellyfin-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
+  #     - traefik.http.routers.jellyfin.service=jellyfin-service
 
-      - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
-      - traefik.http.routers.jellyfin-public.service=jellyfin-public-service
-      - traefik.http.routers.jellyfin-publicsecure.service=jellyfin-public-service
+  #     - traefik.http.services.jellyfin-public-service.loadbalancer.server.port=8096  # internal port, when multiple ports are exposed
+  #     - traefik.http.routers.jellyfin-public.service=jellyfin-public-service
+  #     - traefik.http.routers.jellyfin-publicsecure.service=jellyfin-public-service
 
-      - traefik.http.routers.jellyfin-public.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.jellyfin-public.entrypoints=web
-      - traefik.http.routers.jellyfin-public.middlewares=jellyfin-public-to-https
+  #     - traefik.http.routers.jellyfin-public.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.jellyfin-public.entrypoints=web
+  #     - traefik.http.routers.jellyfin-public.middlewares=jellyfin-public-to-https
 
-      - traefik.http.routers.jellyfin-publicsecure.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
-      - traefik.http.routers.jellyfin-publicsecure.entrypoints=websecure
-      - traefik.http.routers.jellyfin-publicsecure.tls=true
-      - traefik.http.routers.jellyfin-publicsecure.tls.certresolver=myresolver
+  #     - traefik.http.routers.jellyfin-publicsecure.rule=Host("video.${PUBLIC_DOMAIN_NAME}")
+  #     - traefik.http.routers.jellyfin-publicsecure.entrypoints=websecure
+  #     - traefik.http.routers.jellyfin-publicsecure.tls=true
+  #     - traefik.http.routers.jellyfin-publicsecure.tls.certresolver=myresolver
       
-      - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.permanent=true
+  #     - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.scheme=https
+  #     - traefik.http.middlewares.jellyfin-public-to-https.redirectscheme.permanent=true
 
   # openbooks:
   #   # container_name: openbooks
@@ -602,52 +610,52 @@ services:
       # - traefik.http.routers.unpackerr.rule=Host("unpackerr.${LOCAL_DOMAIN_NAME}")
       # - traefik.http.routers.unpackerr.entrypoints=web
 
-  # provides local trailers for movies (and TV shows?)
-  # default login: admin/trailarr
-  trailarr:
-    container_name: trailarr
-    # image: nandyalu/trailarr:latest
-    image: nandyalu/trailarr:nightly
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/trailarr:/config
-      - ${NAS_DIR}/video/TV Shows:/video/TV Shows
-      - "${NAS_DIR}/video/TV Shows [FR]:/video/TV Shows [FR]"
-      - "${NAS_DIR}/video/TV Shows, Kids A:/video/TV Shows, Kids A"
-      - "${NAS_DIR}/video/TV Shows, Kids B:/video/TV Shows, Kids B"
-      - "${NAS_DIR}/video/TV Shows, Kids C:/video/TV Shows, Kids C"
-      - ${NAS_DIR}/video/Movies:/video/Movies
-      - "${NAS_DIR}/video/Movies [FR]:/video/Movies [FR]"
-      - "${NAS_DIR}/video/Movies, Kids A:/video/Movies, Kids A"
-      - "${NAS_DIR}/video/Movies, Kids B:/video/Movies, Kids B"
-      - "${NAS_DIR}/video/Movies, Kids C:/video/Movies, Kids C"
-    ports:
-      - 7889:7889
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.trailarr.rule=Host("trailarr.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.trailarr.entrypoints=web
+  # # provides local trailers for movies (and TV shows?)
+  # # default login: admin/trailarr
+  # trailarr:
+  #   container_name: trailarr
+  #   # image: nandyalu/trailarr:latest
+  #   image: nandyalu/trailarr:nightly
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/trailarr:/config
+  #     - ${NAS_DIR}/video/TV Shows:/video/TV Shows
+  #     - "${NAS_DIR}/video/TV Shows [FR]:/video/TV Shows [FR]"
+  #     - "${NAS_DIR}/video/TV Shows, Kids A:/video/TV Shows, Kids A"
+  #     - "${NAS_DIR}/video/TV Shows, Kids B:/video/TV Shows, Kids B"
+  #     - "${NAS_DIR}/video/TV Shows, Kids C:/video/TV Shows, Kids C"
+  #     - ${NAS_DIR}/video/Movies:/video/Movies
+  #     - "${NAS_DIR}/video/Movies [FR]:/video/Movies [FR]"
+  #     - "${NAS_DIR}/video/Movies, Kids A:/video/Movies, Kids A"
+  #     - "${NAS_DIR}/video/Movies, Kids B:/video/Movies, Kids B"
+  #     - "${NAS_DIR}/video/Movies, Kids C:/video/Movies, Kids C"
+  #   ports:
+  #     - 7889:7889
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.trailarr.rule=Host("trailarr.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.trailarr.entrypoints=web
 
-  jellyseerr:
-    # fork of Overseerr to allow for requests
-    container_name: jellyseerr
-    image: fallenbagel/jellyseerr:latest
-    environment:
-      - LOG_LEVEL=debug
-      - TZ=${TZ}
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/jellyseerr:/app/config
-    ports:
-      - 5055:5055
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=Host("jellyseerr.${LOCAL_DOMAIN_NAME}")
-      - traefik.http.routers.jellyseerr.entrypoints=web
+  # jellyseerr:
+  #   # fork of Overseerr to allow for requests
+  #   container_name: jellyseerr
+  #   image: fallenbagel/jellyseerr:latest
+  #   environment:
+  #     - LOG_LEVEL=debug
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/jellyseerr:/app/config
+  #   ports:
+  #     - 5055:5055
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.jellyseerr.rule=Host("jellyseerr.${LOCAL_DOMAIN_NAME}")
+  #     - traefik.http.routers.jellyseerr.entrypoints=web
 
 
   cross-seed:
@@ -668,7 +676,79 @@ services:
       - traefik.enable=true
       - traefik.http.routers.cross-seed.rule=Host("cross-seed.${LOCAL_DOMAIN_NAME}")
 
+
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    environment:
+      - DB_HOST=${ROMM_DB_HOSTNAME}
+      - DB_NAME=${ROMM_DB_DATABASE_NAME}  # Should match MARIADB_DATABASE in mariadb
+      - DB_USER=${ROMM_DB_USER}  # Should match MARIADB_USER in mariadb
+      - DB_PASSWD=${ROMM_DB_USER_PASSWORD}  # Should match MARIADB_PASSWORD in mariadb
+      - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}  # Generate a key with `openssl rand -hex 32`
+      - SCREENSCRAPER_USER=${ROMM_SCREENSCRAPER_USER}
+      - SCREENSCRAPER_PASSWORD=${ROMM_SCREENSCRAPER_PASSWORD}  # https://docs.romm.app/latest/getting-started/metadata-providers/#screenscraper
+      - RETROACHIEVEMENTS_API_KEY=${ROMM_RETROACHIEVEMENTS_API_KEY}  # https://docs.romm.app/latest/getting-started/metadata-providers/#retroachievements
+      - STEAMGRIDDB_API_KEY=${ROMM_STEAMGRIDDB_API_KEY}  # https://docs.romm.app/latest/getting-started/metadata-providers/#steamgriddb
+      - HASHEOUS_API_ENABLED=true  # https://docs.romm.app/latest/getting-started/metadata-providers/#hasheous
+      - HLTB_API_ENABLED=true
+      - IGDB_CLIENT_ID=${ROMM_IGDB_CLIENT_ID}
+      - IGDB_CLIENT_SECRET=${ROMM_IGDB_CLIENT_SECRET}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
+      - ${DOCKER_USERDIR}/volumes/romm/redis_data:/redis-data # Cached data for background tasks
+      - ${NAS_DIR}/roms:/romm/library:ro # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
+      - ${DOCKER_USERDIR}/volumes/romm/assets:/romm/assets # Uploaded saves, states, etc.
+      - ${DOCKER_USERDIR}/volumes/romm/config:/romm/config # Path where config.yml is stored
+    ports:
+      - 9804:8080
+    depends_on:
+      - romm-db
+      # romm-db:
+      #   condition: service_healthy
+      #   restart: true
+    networks:
+      - romm
+      - default
+    restart: unless-stopped
+
+  romm-db:
+    # image: mariadb:latest
+    image: lscr.io/linuxserver/mariadb:latest  # use the same as HASS
+    hostname: ${ROMM_DB_HOSTNAME}
+    container_name: romm_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${ROMM_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${ROMM_DB_DATABASE_NAME}
+      - MYSQL_USER=${ROMM_DB_USER}
+      - MYSQL_PASSWORD=${ROMM_DB_USER_PASSWORD}
+      # - DOCKER_MODS=linuxserver/mods:universal-cron  # used for backup
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/romm/db:/config
+    # healthcheck:
+    #   test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+    #   start_period: 30s
+    #   start_interval: 10s
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+    networks:
+      - romm
+
 networks:
   default:
-    external: true
     name: meta_external
+    external: true
+  proxy:
+    name: meta_external
+    external: true
+  romm:
+    name: romm-internal
+    internal: true
