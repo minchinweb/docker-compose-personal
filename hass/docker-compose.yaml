@@ -163,6 +163,30 @@ services:
     #   # Needed for Bluetooth via dbus
     #   - apparmor:unconfined
 
+
+  # helper service to pass through IPv6 to the Matter container
+  # will need updating if they ever change: the border router’s address (fe80::f63:bbef:6863:e4ff)
+  # and your ISP prefix (2001:56a…). The same prefix is also in the meta_vlan network
+  # block (in the Meta docker compose).
+  matter_route:
+    image: alpine:3.20
+    container_name: hass_matter_route
+    network_mode: "service:matter"
+    cap_add: [NET_ADMIN]
+    restart: unless-stopped
+    depends_on:
+      matter:
+        condition: service_started
+        restart: true
+    command: >
+      sh -c 'apk add --no-cache iproute2 >/dev/null;
+      while true; do
+        IF=$$(ip -6 -o addr show | awk "/2001:56a/ {print \$$2; exit}");
+        [ -n "$$IF" ] && ip -6 route replace fd8e:3753:fa11:1::/64 via fe80::f63:bbef:6863:e4ff dev $$IF;
+        sleep 60;
+      done'
+
+
   spoolman:
     image: ghcr.io/donkie/spoolman:latest
     hostname: spoolman

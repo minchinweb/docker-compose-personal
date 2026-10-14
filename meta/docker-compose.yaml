@@ -3,6 +3,10 @@
 # environmental variables *for Docker Compose* will be loaded from a `.env` file
 # in the same directory as this file
 
+## DIUN -- https://crazymax.dev/diun/  -- update monitoring
+## Dockge -- https://github.com/louislam/dockge -- Docker compose/stack manager
+## Uptime-Kuma -- https://github.com/louislam/uptime-kuma -- moonitoring tool
+
 services:
   portainer:
     # Portainer - WebUI for Containers
@@ -289,11 +293,17 @@ networks:
   vlan:
     name: meta_vlan
     driver: macvlan
+    enable_ipv6: true
     driver_opts:
       parent: ${NETWORK_INTERFACE}
+      # meta_vlan is IPv4-only on Docker by default
+      com.docker.network.endpoint.sysctls: "net.ipv6.conf.IFNAME.accept_ra_rt_info_max_plen=64"
     ipam:
       config:
         - subnet: 192.168.1.0/24
           gateway: 192.168.1.1
           # 192.168.1.192 to 192.168.1.223
           ip_range: 192.168.1.192/27
+        # ISP-assigned LAN prefix; update if it ever changes
+        - subnet: 2001:56a:f831:6800::/64
+          ip_range: 2001:56a:f831:6800:d0c::/80
