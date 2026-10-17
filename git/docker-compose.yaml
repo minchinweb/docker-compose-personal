@@ -44,6 +44,9 @@ services:
       docker-in-docker:
         condition: service_started
     container_name: runner
+    extra_hosts:
+      # runner is registered against this address, which Docker's DNS can't resolve
+      - git.${LOCAL_DOMAIN_NAME}:${LOCAL_HOST_IP}
     environment:
       DOCKER_HOST: tcp://docker-in-docker:2375
     # User without root privileges, but with access to `./data`.
