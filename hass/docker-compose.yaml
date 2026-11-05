@@ -9,7 +9,7 @@
 services:
   # home automation
   homeassistant:
-    image: lscr.io/linuxserver/homeassistant:2026.10.1-ls254
+    image: lscr.io/linuxserver/homeassistant:2026.11.0-ls263
     # hostname: hass
     container_name: hass
     environment:
@@ -226,6 +226,7 @@ services:
       - HA_TOKEN=${HASS_MCP_LOGS_HA_TOKEN}
       - MCP_AUTH_TOKEN=${HASS_MCP_LOGS_MCP_TOKEN}
       - MCP_PATH=${HASS_MCP_LOGS_MCP_PATH}
+      - MCP_PUBLIC_URL=${HASS_MCP_LOGS_PUBLIC_URL}
     restart: unless-stopped
     ports:
       - 9806:8000
