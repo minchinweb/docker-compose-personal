@@ -155,6 +155,9 @@ services:
       # Required for Bluetooth via D-Bus
       - /run/dbus:/run/dbus:ro
     restart: unless-stopped
+    ports:
+      # used by hass-mcp-logs, which explicity rides this container's network
+      - 9806:8000
     networks:
       default:
         ipv4_address: "192.168.1.193"
@@ -165,9 +168,11 @@ services:
 
 
   # helper service to pass through IPv6 to the Matter container
-  # will need updating if they ever change: the border router’s address (fe80::f63:bbef:6863:e4ff)
-  # and your ISP prefix (2001:56a…). The same prefix is also in the meta_vlan network
-  # block (in the Meta docker compose).
+  # will need updating if they ever change: the border router’s (the IKEA DIRIGERA's) address
+  # (2001:56a:f831:6800:6aec:8aff:fe01:9787) and your ISP prefix (2001:56a…). It's the global
+  # address, not a link-local (fe80::…) one, as the DIRIGERA changes its link-local
+  # addresses. The same prefix is also in the meta_vlan network block (in the Meta docker
+  # compose).
   matter_route:
     image: alpine:3.20
     container_name: hass_matter_route
@@ -182,7 +187,7 @@ services:
       sh -c 'apk add --no-cache iproute2 >/dev/null;
       while true; do
         IF=$$(ip -6 -o addr show | awk "/2001:56a/ {print \$$2; exit}");
-        [ -n "$$IF" ] && ip -6 route replace fd8e:3753:fa11:1::/64 via fe80::f63:bbef:6863:e4ff dev $$IF;
+        [ -n "$$IF" ] && ip -6 route replace fd8e:3753:fa11:1::/64 via 2001:56a:f831:6800:6aec:8aff:fe01:9787 dev $$IF;
         sleep 60;
       done'
 
@@ -223,13 +228,17 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - HA_URL=http://hass:8123
+      - MATTER_CONTAINER=hass_matter
       - HA_TOKEN=${HASS_MCP_LOGS_HA_TOKEN}
       - MCP_AUTH_TOKEN=${HASS_MCP_LOGS_MCP_TOKEN}
       - MCP_PATH=${HASS_MCP_LOGS_MCP_PATH}
       - MCP_PUBLIC_URL=${HASS_MCP_LOGS_PUBLIC_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
-    ports:
-      - 9806:8000
+    # run on the Matter container's network; connect to this container there
+    # (i.e. expose port 8000 there)
+    network_mode: "service:matter"
     labels:
       - traefik.enable=false
       # - traefik.http.services.hass-mcp-logs.loadbalancer.server.port=8000
@@ -238,11 +247,11 @@ services:
       # - traefik.http.routers.hass-mcp-logs.tls=true
       # - traefik.http.routers.hass-mcp-log.tls.certresolver=myresolver
     depends_on:
-      - homeassistant
-    links:
-      - homeassistant
-    networks:
-      - proxy
+      homeassistant:
+        condition: service_started
+      matter:
+        condition: service_started
+        restart: true
 
 
 networks:
