@@ -155,9 +155,6 @@ services:
       # Required for Bluetooth via D-Bus
       - /run/dbus:/run/dbus:ro
     restart: unless-stopped
-    ports:
-      # used by hass-mcp-logs, which explicity rides this container's network
-      - 9806:8000
     networks:
       default:
         ipv4_address: "192.168.1.193"
@@ -236,16 +233,21 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
-    # run on the Matter container's network; connect to this container there
-    # (i.e. expose port 8000 there)
+    # run on the Matter container's network, so its mDNS test hears what the
+    # Matter server hears. Traefik can expose the service directly
     network_mode: "service:matter"
     labels:
-      - traefik.enable=false
-      # - traefik.http.services.hass-mcp-logs.loadbalancer.server.port=8000
+      - traefik.enable=true
+      # the container shares `matter`'s networks, so say which one Traefik is on
+      - traefik.docker.network=meta_external
+      - traefik.http.services.hass-mcp-logs.loadbalancer.server.port=8000
+      - traefik.http.routers.hass-mcp-logs.service=hass-mcp-logs
+      - traefik.http.routers.hass-mcp-logs.rule=Host("mcp.ha.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.hass-mcp-logs.entrypoints=web
       # - traefik.http.routers.hass-mcp-logs.rule=Host("logs.ha.${PUBLIC_DOMAIN_NAME}")
       # - traefik.http.routers.hass-mcp-logs.entrypoints=websecure
       # - traefik.http.routers.hass-mcp-logs.tls=true
-      # - traefik.http.routers.hass-mcp-log.tls.certresolver=myresolver
+      # - traefik.http.routers.hass-mcp-logs.tls.certresolver=myresolver
     depends_on:
       homeassistant:
         condition: service_started
