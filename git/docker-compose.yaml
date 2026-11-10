@@ -49,15 +49,29 @@ services:
       - git.${LOCAL_DOMAIN_NAME}:${LOCAL_HOST_IP}
     environment:
       DOCKER_HOST: tcp://docker-in-docker:2375
+      # Substituted into runner-config.yml so *job* containers (DinD) can reach Forgejo
+      FORGEJO_HOSTNAME: git.${LOCAL_DOMAIN_NAME}
+      FORGEJO_HOST_IP: ${LOCAL_HOST_IP}
     # User without root privileges, but with access to `./data`.
     user: ${PUID}:${PGID}
     volumes:
       - ${DOCKER_USERDIR}/volumes/forgejo-runner:/data
+      - ./runner-config.yml:/config/runner-config.yml:ro
     ports:
       - 9984:9984
     restart: 'unless-stopped'
     # command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'  # while doing manual setup
-    command: '/bin/sh -c "sleep 5; forgejo-runner daemon"'
+    # Render config so job containers get --add-host=<forgejo hostname>:<LAN IP>
+    # (runner extra_hosts alone is not inherited by DinD job containers).
+    command:
+      - /bin/sh
+      - -c
+      - |
+          sleep 5
+          sed -e "s|__FORGEJO_HOSTNAME__|$${FORGEJO_HOSTNAME}|g" \
+              -e "s|__FORGEJO_HOST_IP__|$${FORGEJO_HOST_IP}|g" \
+              /config/runner-config.yml > /data/config.yml
+          exec forgejo-runner daemon --config /data/config.yml
 
 
 networks:
