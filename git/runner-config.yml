@@ -15,9 +15,14 @@ runner:
   insecure: false
   fetch_timeout: 5s
   fetch_interval: 2s
+  envs:
+    # Ignore `master` branch name hint
+    GIT_CONFIG_COUNT: "1"
+    GIT_CONFIG_KEY_0: init.defaultBranch
+    GIT_CONFIG_VALUE_0: master
   # Job containers run inside DinD and do not inherit the runner's extra_hosts.
-  # Keep ubuntu-latest on a current act image; workflows use runs-on: ubuntu-latest.
   labels:
+    # Keep ubuntu-latest on a current act image; workflows use runs-on: ubuntu-latest.
     - "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
     - "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
     - "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
@@ -34,11 +39,12 @@ container:
   network: ""
   enable_ipv6: false
   privileged: false
-  # Same mapping the runner container already has via compose extra_hosts.
-  # Required so actions/checkout can reach http://git.<lan-domain>/...
-  options: "--add-host=__FORGEJO_HOSTNAME__:__FORGEJO_HOST_IP__"
+  # --add-host: so actions/checkout can reach http://git.<lan-domain>/...
+  # -v /obsidian-vault-deloy: write built site into the volume served at jrnl.<lan-domain>
+  options: "--add-host=__FORGEJO_HOSTNAME__:__FORGEJO_HOST_IP__ -v /obsidian-vault-deloy:/obsidian-vault-deloy"
   workdir_parent:
-  valid_volumes: []
+  valid_volumes:
+    - /obsidian-vault-deloy
   # Empty: use DOCKER_HOST (tcp://docker-in-docker:2375) from the compose service.
   docker_host: ""
   force_pull: false

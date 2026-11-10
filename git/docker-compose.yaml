@@ -34,6 +34,9 @@ services:
     container_name: docker_dind
     privileged: true
     command: ['dockerd', '-H', 'tcp://0.0.0.0:2375', '--tls=false']
+    volumes:
+      # Host path served by frontend `jrnl`
+      - ${DOCKER_USERDIR}/volumes/jrnl:/obsidian-vault-deloy
     restart: unless-stopped
 
   forgejo-runner:
