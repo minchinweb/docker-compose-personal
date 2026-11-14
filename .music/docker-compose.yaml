@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     # treafik seems to timeout
     labels:
-      - traefik.enable=ture
+      - traefik.enable=true
       - traefik.port=5000
       - "traefik.frontend.rule=Host:musicbrainz.${LOCAL_DOMAIN_NAME}"  
 
@@ -41,6 +41,6 @@ services:
       - 9928:8337
     restart: unless-stopped
     labels:
-      - traefik.enable=ture
+      - traefik.enable=true
       - traefik.port=8337
       - "traefik.frontend.rule=Host:beets.${LOCAL_DOMAIN_NAME}" 
