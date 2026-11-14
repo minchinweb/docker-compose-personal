@@ -23,9 +23,16 @@ services:
       - ${DOCKER_USERDIR}/volumes/minecraft:/data
     ports:
       - 19132:19132/udp
+      - 19132:19132/tcp
     restart: unless-stopped
     stdin_open: true
     tty: true
+    # image's default check pings 127.0.0.1 over IPv4, but the server doesn't
+    # bind an IPv4 socket there, so check the process instead
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qa '^\\./bedrock_server' /proc/[0-9]*/cmdline"]
+      interval: 30s
+      start_period: 60s
     # labels:
     #   # better to just enable port forwarding
     #   - traefik.enable=true
