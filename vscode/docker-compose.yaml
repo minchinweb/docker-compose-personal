@@ -8,7 +8,6 @@ services:
   vscode:
     image: lscr.io/linuxserver/code-server
     container_name: vscode
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -39,6 +38,7 @@ services:
     ports:
       # - 9934:8443
       - 9911:8443
+    restart: unless-stopped
     labels:
       # coder.com version doesn't work as either a subdomain or a folder with traefik
       # - traefik.enable=false

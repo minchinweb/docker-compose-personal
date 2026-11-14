@@ -23,9 +23,9 @@ services:
   rt:
     build:
       context: ../../build/rt5
-    restart: unless-stopped
     ports:
       - 9964:80
+    restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.rt5.rule=Host("rt.${LOCAL_DOMAIN_NAME}")

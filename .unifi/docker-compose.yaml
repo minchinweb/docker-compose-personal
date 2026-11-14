@@ -12,7 +12,6 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - MEM_LIMIT=1280
-    restart: unless-stopped
     volumes:
       - ${DOCKER_USERDIR}/volumes/unifi:/config
     ports:
@@ -27,6 +26,7 @@ services:
       - 8443:8443
       - 8843:8843
       - 8880:8880
+    restart: unless-stopped
     # needs to be on macvlan network
     # https://github.com/jacobalberty/unifi-docker/issues/159
     # mem_limit: 512m

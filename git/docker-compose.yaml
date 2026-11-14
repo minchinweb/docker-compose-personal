@@ -14,7 +14,6 @@ services:
       - FORGEJO__database__SQLITE_JOURNAL_MODE=WAL
       - FORGEJO__APP_NAME=ForgeJo on Normandie
       - FORGEJO__ui.meta__DESCRIPTION=Git hosting on Normandie
-    restart: unless-stopped
     # networks:
     #   - forgejo
     volumes:
@@ -24,6 +23,7 @@ services:
     ports:
       - 9982:3000
       - "9983:22"
+    restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.forgejo.rule=Host("git.${LOCAL_DOMAIN_NAME}")

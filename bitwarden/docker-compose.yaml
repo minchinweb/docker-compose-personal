@@ -17,7 +17,6 @@ services:
   vaultwarden:
     image: vaultwarden/server:latest
     container_name: vaultwarden
-    restart: unless-stopped
     # user: ${PUID}:${PGID}
     environment:
       - TZ=${TZ}
@@ -33,6 +32,7 @@ services:
       - 9962:8080
       # websocket
       - 3012:3012
+    restart: unless-stopped
     labels:
       # - traefik.enable=false
       - traefik.enable=true

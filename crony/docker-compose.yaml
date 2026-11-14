@@ -27,6 +27,7 @@ services:
       # optional: log level (one of trace, debug, info, warn, error, fatal), info is default if not set
       - LOG_LEVEL=info
     mem_limit: 30MB
+    restart: unless-stopped
 
   navidrome-backup:
     image: ghcr.io/0xerr0r/navidrome-backup-docker

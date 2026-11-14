@@ -8,7 +8,6 @@ services:
   bedrock_peaceful:
     image: itzg/minecraft-bedrock-server
     container_name: minecraft_bedrock_peaceful
-    restart: unless-stopped
     environment:
       - EULA=TRUE
       # - VERSION=${MINECRAFT_VERSION}
@@ -24,6 +23,7 @@ services:
       - ${DOCKER_USERDIR}/volumes/minecraft:/data
     ports:
       - 19132:19132/udp
+    restart: unless-stopped
     stdin_open: true
     tty: true
     # labels:
@@ -61,7 +61,6 @@ services:
   backup:
     image: kaiede/minecraft-bedrock-backup
     # name: bedrock_backup
-    restart: unless-stopped
     depends_on:
       - bedrock_peaceful
     environment:
@@ -73,6 +72,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${DOCKER_USERDIR}/volumes/minecraft:/server
       - ${NAS_DIR}/home/trocadero/minecraft:/backups
+    restart: unless-stopped
     stdin_open: true
     tty: true
 

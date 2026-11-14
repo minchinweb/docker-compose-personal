@@ -8,7 +8,6 @@ services:
     # image: stevearc/pypicloud:1.0.10-py3-alpine
     # build: ../../build/pypi
     image: ghcr.io/minchinweb/pypi
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -16,6 +15,7 @@ services:
       - 9920:8080
     volumes:
       - ${DOCKER_USERDIR}/volumes/pypi:/config
+    restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.pypi.rule=Host("pypi.${LOCAL_DOMAIN_NAME}")  # 2.0

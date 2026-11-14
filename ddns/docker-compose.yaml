@@ -8,7 +8,6 @@ services:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_baffinisland
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -17,6 +16,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_BAFFINISLAND}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -24,7 +24,6 @@ services:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -33,6 +32,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_NORMANDIE}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -41,7 +41,6 @@ services:
     # build: ../../build/ddns
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_ab.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -50,6 +49,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_AB}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -58,7 +58,6 @@ services:
     # build: ../../build/ddns
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_vault.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -67,6 +66,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_VAULT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -75,7 +75,6 @@ services:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_audiobooks.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -84,6 +83,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_AUDIOBOOKS}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -91,7 +91,6 @@ services:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_books.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -100,6 +99,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_BOOKS}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -108,7 +108,6 @@ services:
     # build: ../../build/ddns
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_booksonic.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -117,6 +116,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_BOOKSONIC}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -142,7 +142,6 @@ services:
     # build: ../../build/ddns
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_music.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -151,6 +150,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_MUSIC}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -159,7 +159,6 @@ services:
     # build: ../../build/ddns
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_video.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -168,13 +167,13 @@ services:
       - DDNS_KEY=${DDNS_KEY_VIDEO}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
   ddns-home-assistant:
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_ha.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -183,6 +182,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_HOME_ASSISTANT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
@@ -204,7 +204,6 @@ services:
   ddns-thelounge:
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_chat.${PUBLIC_DOMAIN_NAME}
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -213,6 +212,7 @@ services:
       - DDNS_KEY=${DDNS_KEY_CHAT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
     labels:
       - traefik.enable=false  
 

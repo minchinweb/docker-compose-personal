@@ -10,7 +10,6 @@ services:
   vanilla:
     build: ../../build/starbound
     # container_name: starbound
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -20,13 +19,13 @@ services:
       - ${DOCKER_USERDIR}/volumes/starbound-config:/config
     ports:
       - 21025:21025
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 
   frackin-universe:
     build: ../../build/starbound
     # container_name: starbound_fu
-    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -36,6 +35,7 @@ services:
       - ${DOCKER_USERDIR}/volumes/starbound-fu-config:/config
     ports:
       - 21030:21025
+    restart: unless-stopped
     labels:
       - traefik.enable=false
 

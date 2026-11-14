@@ -35,12 +35,12 @@ services:
       - bridge
     ports:
       - 9950:8000
-    restart: unless-stopped
     volumes:
       - ${DOCKER_USERDIR}/volumes/mayan/storage:/var/lib/mayan
       # Optional volumes to access external data like staging or watch folders
       - ${DOCKER_USERDIR}/volumes/mayan/staging:/staging_files
       - ${DOCKER_USERDIR}/volumes/mayan/watch:/watch_folder
+    restart: unless-stopped
 
   postgresql:
     environment:
@@ -50,9 +50,9 @@ services:
     image: postgres:9.6-alpine
     networks:
       - bridge
-    restart: unless-stopped
     volumes:
       - ${DOCKER_USERDIR}/volumes/mayan/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
 
   redis:
     command:
@@ -76,9 +76,9 @@ services:
     image: redis:5.0-alpine
     networks:
       - bridge
-    restart: unless-stopped
     volumes:
       - ${DOCKER_USERDIR}/volumes/mayan/redis:/data
+    restart: unless-stopped
 
   # Optional services
 

@@ -111,20 +111,19 @@ services:
     image: crazymax/fail2ban:latest
     container_name: fail2ban
     network_mode: "host"
-    restart: always
     cap_add:
       - NET_ADMIN
       - NET_RAW
     volumes:
       - ${DOCKER_USERDIR}/volumes/traefik/logs:/var/log:ro
       - ${DOCKER_USERDIR}/volumes/fail2ban/data:/data
+    restart: always
     labels:
       - traefik.enable=false
 
   landingpage:
     # serve a static file as the "landing page"
     image: halverneus/static-file-server
-    restart: unless-stopped
     environment:
       - FOLDER=/config
       - DEBUG=true
@@ -135,6 +134,7 @@ services:
       - "${DOCKER_USERDIR}/volumes/starbound-extra:/config/spencer:ro"
     ports:
       - 9918:8080
+    restart: unless-stopped
     labels:
       - traefik.enable=true
       # - traefik.http.routers.landing-page.rule=Host("${LOCAL_DOMAIN_NAME}") || Host("${PUBLIC_DOMAIN_NAME}")
@@ -161,7 +161,6 @@ services:
     # serve my notes as a pre-rendered static site
     # don't make publically available without access control
     image: halverneus/static-file-server
-    restart: unless-stopped
     environment:
       - FOLDER=/config
       - DEBUG=true
@@ -171,6 +170,7 @@ services:
       # - "${NAS_DIR}/video/Movies/Ghostbusters - Afterlife (2021):/config/alex:ro"
     ports:
       - 9990:8080
+    restart: unless-stopped
     labels:
       - traefik.enable=true
  

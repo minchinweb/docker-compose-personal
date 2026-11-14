@@ -9,7 +9,6 @@ services:
     # image: local/ffsync
     build: ../../build/ffsync
     container_name: ffsync
-    restart: "no"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -23,6 +22,7 @@ services:
       - ${FFSYNC_PORT}:${FFSYNC_PORT}
     volumes:
       - ${DOCKER_USERDIR}/volumes/ffsync:/data
+    restart: "no"
     labels:
       - traefik.enable=true
       - traefik.port=${FFSYNC_PORT}
