@@ -37,6 +37,8 @@ services:
     volumes:
       - ${NAS_DIR}/home/trocadero/navidrome:/out
       - ${DOCKER_USERDIR}/volumes/navidrome:/data
+      # patched: Navidrome renamed album.artist to album.album_artist
+      - ./starred.sql:/opt/reports/starred.sql:ro
     labels:
       # every monday
       - crony.schedule="0 0 * * 1"
