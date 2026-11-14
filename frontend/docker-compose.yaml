@@ -23,6 +23,7 @@ services:
       - --api=true
       - --api.insecure=true  # 2.0
       - --api.dashboard=true
+      - --ping=true  # enables /ping on the traefik entrypoint (:8080), used by healthcheck
 
       - --providers.docker=true  # 2.0
       - --providers.docker.exposedByDefault=false
@@ -70,6 +71,12 @@ services:
       - ${DOCKER_USERDIR}/volumes/traefik/acme:/etc/traefik/acme
       - ${DOCKER_USERDIR}/volumes/traefik/logs:/var/log
       # - ${DOCKER_USERDIR}/volumes/shared:/shared
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: always
     labels:
       - traefik.enable=true
@@ -96,7 +103,11 @@ services:
     # may need to update when I bump Traefik to v3
     image: ldez/traefik-certs-dumper:v2.10.0
     user: ${PUID}:${PGID}
+    depends_on:
+      traefik:
+        condition: service_healthy
     entrypoint: sh -c '
+      sleep 30;
       while ! [ -e /data/acme/acme.json ]
       || ! [ `jq ".[] | .Certificates | length" /data/acme/acme.json | jq -s "add" ` != 0 ]; do
       sleep 1
