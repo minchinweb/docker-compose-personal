@@ -35,7 +35,10 @@ services:
       - --entrypoints.web.forwardedheaders.trustedips=192.168.1.1
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.forwardedheaders.trustedips=192.168.1.1
-      - --entrypoints.websecure.http.tls.certresolver=myresolver
+      # default resolver removed: it made Traefik request certs for .lan hosts.
+      # public routers set tls.certresolver=myresolver in their own labels.
+      # - --entrypoints.websecure.http.tls.certresolver=myresolver
+      - --entrypoints.websecure.http.tls=true  # keep TLS on :443, but with no ACME resolver
       # - --entrypoints.irc.address=:6667
       # - --entrypoints.irc.forwardedheaders.trustedips=192.168.1.1
       # - --entrypoints.ircsecure.address=:6697
