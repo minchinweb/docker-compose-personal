@@ -98,7 +98,7 @@ services:
     user: ${PUID}:${PGID}
     entrypoint: sh -c '
       while ! [ -e /data/acme/acme.json ]
-      || ! [ `jq ".[] | .Certificates | length" /data/accme/acme.json | jq -s "add" ` != 0 ]; do
+      || ! [ `jq ".[] | .Certificates | length" /data/acme/acme.json | jq -s "add" ` != 0 ]; do
       sleep 1
       ; done
       && traefik-certs-dumper file --version v2 --watch
