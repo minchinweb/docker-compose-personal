@@ -89,12 +89,15 @@ services:
       - "443"
     environment:
       - TZ=${TZ}
-      - WEBPASSWORD=${PIHOLE_PASSWORD}
-      - FTLCONF_LOCAL_IPV4=192.168.1.194
-      - REV_SERVER=true
-      - REV_SERVER_TARGET=192.168.1.1
-      - REV_SERVER_CIDR=192.168.1.0/24
-      - REV_SERVER_DOMAIN=lan
+      # Pi-hole v6 settings; anything set with FTLCONF_* is read-only in the web UI
+      # https://docs.pi-hole.net/docker/configuration/
+      - FTLCONF_webserver_api_password=${PIHOLE_PASSWORD}
+      - FTLCONF_dns_reply_host_force4=true
+      - FTLCONF_dns_reply_host_IPv4=192.168.1.194
+      # reverse lookups (conditional forwarding): enabled,CIDR,router,domain; entries split by ';'
+      - FTLCONF_dns_revServers=true,192.168.1.0/24,192.168.1.1,lan;true,192.168.1.0/24,192.168.1.1,local
+      # "permit all origins" -- needed to answer on both the vlan and default networks
+      - FTLCONF_dns_listeningMode=all
     dns:
       - 127.0.0.1
       - 8.8.8.8
@@ -185,23 +188,23 @@ services:
   #   # `scrutiny-collector-metrics run` for your first job or wait
   #   # until around midnight for it to kick off.
 
-  qdirstat:
-    image: jlesage/qdirstat
-    container_name: qdirstat
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/qdirstat:/config
-      - /:/storage:ro
-    ports:
-      - 9970:5800
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.qdirstat.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}")
-      # - traefik.http.routers.qdirstat.tls.certresolver=none  # for .lan domain, no ACME challenge
+  # qdirstat:
+  #   image: jlesage/qdirstat
+  #   container_name: qdirstat
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/qdirstat:/config
+  #     - /:/storage:ro
+  #   ports:
+  #     - 9970:5800
+  #   restart: unless-stopped
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.qdirstat.rule=Host("dirstat.${LOCAL_DOMAIN_NAME}")
+  #     # - traefik.http.routers.qdirstat.tls.certresolver=none  # for .lan domain, no ACME challenge
 
 
   rsnapshot:
@@ -223,7 +226,7 @@ services:
     labels:
       - traefik.enable=false
 
-  wiregaurd:
+  wireguard:
     image: lscr.io/linuxserver/wireguard:latest
     container_name: wireguard
     cap_add:
@@ -239,7 +242,10 @@ services:
       # - INTERNAL_SUBNET=10.13.13.0  # Internal subnet for the wireguard and server and peers (only change if it clashes)
       # - ALLOWEDIPS=0.0.0.0/0  # The IPs/Ranges that the peers will be able to reach using the VPN connection.
       # - PERSISTENTKEEPALIVE_PEERS=  # optional
-      - LOG_CONFS=true  # optional, generated QR codes will be displayed in the docker log
+      # LOG_CONFS prints peer configs (incl. private keys) and QR codes to the docker log.
+      # To see a new client's setup details, comment out this line (default is true),
+      # recreate the container, grab the config, then put the line back.
+      - LOG_CONFS=false
     volumes:
       - ${DOCKER_USERDIR}/volumes/wireguard:/config
     ports:
@@ -252,7 +258,7 @@ services:
     # https://github.com/tiredofit/docker-db-backup
     # Backs up CouchDB, InfluxDB, MySQL/MariaDB, Microsoft SQL, MongoDB, Postgres, Redis servers.
     # image: ghcr.io/tiredofit/docker-db-backup
-    image: docker.io/nfrastack/db-backup:5.0.5
+    image: docker.io/nfrastack/db-backup:5.0.11
     container_name: db_backup
     mem_limit: 1g
     memswap_limit: 1g
