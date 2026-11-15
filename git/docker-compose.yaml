@@ -36,13 +36,15 @@ services:
     command: ['dockerd', '-H', 'tcp://0.0.0.0:2375', '--tls=false']
     volumes:
       # Host path served by frontend `jrnl`
-      - ${DOCKER_USERDIR}/volumes/jrnl:/obsidian-vault-deloy
+      - ${DOCKER_USERDIR}/volumes/jrnl:/obsidian-vault-deploy
     restart: unless-stopped
+    # the daemon listens on 2375 with no TLS or auth, so keep it off meta_external
+    networks:
+      - forgejo-ci
 
   forgejo-runner:
-    image: code.forgejo.org/forgejo/runner:3.3.0
-    links:
-      - docker-in-docker
+    # v13 notes: https://forgejo.org/2026-08-runner-release-v13/
+    image: code.forgejo.org/forgejo/runner:13.2.1
     depends_on:
       docker-in-docker:
         condition: service_started
@@ -63,6 +65,10 @@ services:
     ports:
       - 9984:9984
     restart: 'unless-stopped'
+    # reaches Forgejo via git.${LOCAL_DOMAIN_NAME} -> LOCAL_HOST_IP (Traefik), so it
+    # doesn't need meta_external
+    networks:
+      - forgejo-ci
     # command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'  # while doing manual setup
     # Render config so job containers get --add-host=<forgejo hostname>:<LAN IP>
     # (runner extra_hosts alone is not inherited by DinD job containers).
@@ -81,3 +87,7 @@ networks:
   default:
     external: true
     name: meta_external
+  forgejo-ci:
+    # private network for the runner and DinD. Not `internal: true`: DinD needs internet
+    # access to pull job images, and the runner reaches Forgejo through the host's LAN IP.
+    name: forgejo-ci
