@@ -1,6 +1,40 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
+  "extends": ["config:recommended", ":disableDependencyDashboard"],
+  "description": "Dot-prefixed stacks are inactive experiments; don't open PRs for them",
+  "ignorePaths": [
+    ".burst-energy/**",
+    ".ffsync/**",
+    ".irc/**",
+    ".mayan/**",
+    ".music/**",
+    ".paperless/**",
+    ".papermerge/**",
+    ".pypi/**",
+    ".social/**",
+    ".unifi/**"
+  ],
+  "timezone": "America/Edmonton",
+  "schedule": ["before 6am on saturday"],
+  "commitMessageAction": "bump",
+  "packageRules": [
+    {
+      "description": "One PR per stack: '[media] bump images'. Majors still split out (separateMajorMinor).",
+      "matchManagers": ["docker-compose"],
+      "groupName": "images",
+      "additionalBranchPrefix": "{{parentDir}}-",
+      "commitMessagePrefix": "[{{parentDir}}]"
+    },
+    {
+      "description": "linuxserver.io tags look like 2026.11.1-ls264",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["lscr.io/linuxserver/**"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-ls(?<build>\\d+))?$"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "commitMessagePrefix": "[ci]"
+    }
   ]
 }
