@@ -1,0 +1,18 @@
+name: check compose files
+
+on:
+  push:
+    paths: ['*/docker-compose.yaml', '.github/check-compose.sh', '.github/workflows/check-compose.yaml']
+  pull_request:
+    paths: ['*/docker-compose.yaml', '.github/check-compose.sh', '.github/workflows/check-compose.yaml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: .github/check-compose.sh
