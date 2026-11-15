@@ -76,6 +76,7 @@ services:
   pihole:
     image: pihole/pihole
     container_name: pihole_194
+    hostname: pihole194
     # ports:
     #   - "53:53/tcp"
     #   - "53:53/udp"
@@ -250,18 +251,27 @@ services:
   db-backup:
     # https://github.com/tiredofit/docker-db-backup
     # Backs up CouchDB, InfluxDB, MySQL/MariaDB, Microsoft SQL, MongoDB, Postgres, Redis servers.
-    image: ghcr.io/tiredofit/docker-db-backup
+    # image: ghcr.io/tiredofit/docker-db-backup
+    image: docker.io/nfrastack/db-backup:5.0.5
     container_name: db_backup
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 1
     environment:
-      - USER_DBBACKUP=${PUID}
-      - GROUP_DBBACKUP=${PGID}
+      # - USER_DBBACKUP=${PUID}
+      # - GROUP_DBBACKUP=${PGID}
+      - CONTAINER_USER_DBBACKUP=${PUID}
+      - CONTAINER_GROUP_DBBACKUP=${PGID}
       - TIMEZONE=${TZ}
       - CONTAINER_NAME=db_backup
       - CONTAINER_ENABLE_MONITORING=FALSE
       - DEFAULT_COMPRESSION=GZ
-      - DEFAULT_GZ_RSYNCABLE=TRUE
+      # - DEFAULT_GZ_RSYNCABLE=TRUE
+      - DEFAULT_COMPRESSION_RSYNCABLE=TRUE
+      - DEFAULT_BACKUP_INTERVAL=1440  # daily; don't rely on the implicit default
       - DEFAULT_CLEANUP_TIME=14400  # 10 days
       # - DEBUG_MODE=true
+      - BACKUP_JOB_CONCURRENCY=1   # log showed concurrency=0 (unlimited)
 
       # Home Assistant
       - DB01_NAME=homeassistant  # may not matter in backup, but used for backup filename
@@ -269,15 +279,29 @@ services:
       - DB01_HOST=hass_db
       - DB01_USER=root
       - DB01_PASS=${MYSQL_ROOT_PASSWORD}
-      - DB01_BACKUP_BEGIN=+2
+      # - DB01_BACKUP_BEGIN=+2
+      - DB01_BACKUP_BEGIN=0255
 
       # Immich
       - DB02_NAME=immich  # may not matter in backup, but used for backup filename
       - DB02_TYPE=postgres
-      - DB02_HOST=immich-db
+      - DB02_HOST=immich-postgres
       - DB02_USER=${IMMICH_DB_USERNAME}
       - DB02_PASS=${IMMICH_DB_PASSWORD}
-      - DB02_BACKUP_BEGIN=+1
+      # - DB02_BACKUP_BEGIN=+1
+      - DB02_BACKUP_BEGIN=0325
+
+      # Strathcona Power Django
+      - DB03_NAME=${SPL_DJ_DB_DATABASE_NAME}  # spl-django
+      # - DB03_TYPE=postgres
+      - DB03_HOST=${SPL_DJ_DB_HOSTNAME}
+      - DB03_PORT=${SPL_DJ_DB_DIRECT_PORT}
+      - DB03_USER=${SPL_DJ_DB_USERNAME}
+      - DB03_PASS=${SPL_DJ_DB_PASSWORD}
+      # - DB03_BACKUP_BEGIN=+4
+      - DB03_BACKUP_BEGIN=0355
+
+      # TODO: add ROMM
 
     volumes:
       - ${DOCKER_USERDIR}/volumes/db-backups:/backup
