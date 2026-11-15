@@ -171,7 +171,7 @@ services:
   # addresses. The same prefix is also in the meta_vlan network block (in the Meta docker
   # compose).
   matter_route:
-    image: alpine:3.20
+    image: alpine:3.24
     container_name: hass_matter_route
     network_mode: "service:matter"
     cap_add: [NET_ADMIN]
