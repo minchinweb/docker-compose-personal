@@ -17,7 +17,8 @@
 services:
   # media
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent
+    # MyAnonaMouse didn't approve v5.3.0 (due to RAM usage)
+    image: lscr.io/linuxserver/qbittorrent:5.2.4
     container_name: qbittorrent
     hostname: qbt
     # hostname: qbittorrent
