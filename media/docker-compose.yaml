@@ -737,8 +737,9 @@ services:
     #   interval: 10s
     #   timeout: 5s
     #   retries: 5
-    ports:
-      - 3306:3306
+    # not published: romm-internal is an internal network, and hass_db already has host 3306
+    # ports:
+    #   - 3306:3306
     restart: unless-stopped
     networks:
       - romm
