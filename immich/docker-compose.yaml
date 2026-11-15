@@ -72,6 +72,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       # - MACHINE_LEARNING_MODEL_TTL=300  # default is 300 seconds
+      - ORT_DISABLE_TELEMETRY=1
     volumes:
       - ${DOCKER_USERDIR}/volumes/immich-model-cache:/cache
     # env_file:
