@@ -4,7 +4,7 @@
 # in the same directory as this file
 
 services:
-  ddns-baffinsisland:
+  ddns-baffinisland:
     # build: ../../build/ddns  # also at minchinweb/ddns:latest
     image: ghcr.io/minchinweb/ddns
     container_name: ddns_baffinisland
