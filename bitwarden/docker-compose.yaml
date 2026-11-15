@@ -21,17 +21,15 @@ services:
     environment:
       - TZ=${TZ}
       - ROCKET_PORT=8080
-      - WEBSOCKET_ENABLED=true
       - ADMIN_TOKEN=${BITWARDEN_ADMIN_TOKEN}  # value in config.json overrules this
       - DOMAIN=https://vault.${PUBLIC_DOMAIN_NAME}
-      # - SIGNUPS_ALLOWED=false
+      - SIGNUPS_ALLOWED=false
       # - INVITATIONS_ALLOWED=false
     volumes:
       - ${DOCKER_USERDIR}/volumes/vaultwarden:/data
     ports:
       - 9962:8080
-      # websocket
-      - 3012:3012
+      # websockets are served on 8080 since v1.29; port 3012 is gone
     restart: unless-stopped
     labels:
       # - traefik.enable=false
@@ -72,22 +70,6 @@ services:
       - traefik.http.middlewares.bitwarden-to-https.redirectscheme.permanent=true
 
 
-      - traefik.http.routers.bitwarden-websocket.rule=Host("vault.${PUBLIC_DOMAIN_NAME}") && Path("/notifications/hub")
-      - traefik.http.routers.bitwarden-websocket.entrypoints=web
-      - traefik.http.routers.bitwarden-websocket.middlewares=bitwarden-websocket-to-https
-
-      - traefik.http.routers.bitwarden-websocket-secure.rule=Host("vault.${PUBLIC_DOMAIN_NAME}") && Path("/notifications/hub")
-      - traefik.http.routers.bitwarden-websocket-secure.entrypoints=websecure
-      - traefik.http.routers.bitwarden-websocket-secure.tls=true
-      - traefik.http.routers.bitwarden-websocket-secure.tls.certresolver=myresolver
-
-
-      - traefik.http.services.bitwarden-websocket-service.loadbalancer.server.port=3012
-      - traefik.http.routers.bitwarden-websocket.service=bitwarden-websocket-service
-      - traefik.http.routers.bitwarden-websocket-secure.service=bitwarden-websocket-service
-
-      - traefik.http.middlewares.bitwarden-websocket-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.bitwarden-websocket-to-https.redirectscheme.permanent=true
 
 
   # backup:
