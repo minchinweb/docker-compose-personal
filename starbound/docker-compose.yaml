@@ -5,6 +5,9 @@
 
 # mods are shared on the network using Samba (on the host)
 
+## Starbound-RCONSample -- https://github.com/Silverfeelin/Starbound-RCONSample
+## CrossBound -- https://github.com/MyristicaFragrans/CrossBound -- cross chat in Discord
+
 # Starbound
 services:
   vanilla:
@@ -23,21 +26,23 @@ services:
     labels:
       - traefik.enable=false
 
-  frackin-universe:
-    build: ../../build/starbound
-    # container_name: starbound_fu
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${DOCKER_USERDIR}/volumes/starbound-app:/app:ro
-      - ${DOCKER_USERDIR}/volumes/starbound-fu-config:/config
-    ports:
-      - 21030:21025
-    restart: unless-stopped
-    labels:
-      - traefik.enable=false
+  # was eating up too much memory, with everything else running on the server
+  # frackin-universe:
+  #   build: ../../build/starbound
+  #   # container_name: starbound_fu
+  #   restart: unless-stopped
+  #   mem_limit: 1200m
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${DOCKER_USERDIR}/volumes/starbound-app:/app:ro
+  #     - ${DOCKER_USERDIR}/volumes/starbound-fu-config:/config
+  #   ports:
+  #     - 21030:21025
+  #   labels:
+  #     - traefik.enable=false
 
 networks:
   default:
