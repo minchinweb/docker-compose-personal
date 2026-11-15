@@ -41,7 +41,8 @@ services:
       - ./starred.sql:/opt/reports/starred.sql:ro
     labels:
       # every monday
-      - crony.schedule="0 0 * * 1"
+      # quote the whole item -- `key="value"` would keep the quotes as part of the value
+      - "crony.schedule=0 0 * * 1"
 
 networks:
   default:
