@@ -26,7 +26,7 @@ services:
       # - ${DOCKER_USERDIR}/volumes/unifi/data/sites/default:/config/docker/volumes/unifi
       - ${DOCKER_USERDIR}/volumes/mosquitto/config:/config/docker/volumes/mosquitto
       - ${DOCKER_USERDIR}/volumes/ngircd:/config/docker/volumes/ngircd
-      - ${DOCKER_USERDIR}/volumes/ngircd.old:/config/docker/volumes/ngircd.old
+      # - ${DOCKER_USERDIR}/volumes/ngircd.old:/config/docker/volumes/ngircd.old
       - ${DOCKER_USERDIR}/volumes/thelounge:/config/docker/volumes/thelounge
       # - ${DOCKER_USERDIR}/volumes/rutorrent:/config/docker/volumes/rutorrent
       # - ${DOCKER_USERDIR}/volumes/minecraft:/config/docker/volumes/minecraft
@@ -35,6 +35,7 @@ services:
       # - ${DOCKER_USERDIR}/volumes/shared:/shared
       - ${DOCKER_USERDIR}/backup:/config/docker/backup
       - ${DOCKER_USERDIR}/volumes/ergo:/config/docker/volumes/ergo
+      - ${DOCKER_USERDIR}/volumes/starbound-config:/config/docker/volumes/starbound-config
     ports:
       # - 9934:8443
       - 9911:8443
