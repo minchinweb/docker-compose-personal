@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":disableDependencyDashboard"],
+  "extends": [
+    "config:recommended",
+    ":disableDependencyDashboard"
+  ],
   "description": "Dot-prefixed stacks are inactive experiments; don't open PRs for them",
   "ignorePaths": [
     ".burst-energy/**",
@@ -15,24 +18,51 @@
     ".unifi/**"
   ],
   "timezone": "America/Edmonton",
-  "schedule": ["before 6am on saturday"],
+  "schedule": [
+    "before 6am on saturday"
+  ],
   "commitMessageAction": "bump",
   "packageRules": [
     {
       "description": "One PR per stack: '[media] bump images'. Majors still split out (separateMajorMinor).",
-      "matchManagers": ["docker-compose"],
+      "matchManagers": [
+        "docker-compose"
+      ],
       "groupName": "images",
       "additionalBranchPrefix": "{{parentDir}}-",
       "commitMessagePrefix": "[{{parentDir}}]"
     },
     {
       "description": "linuxserver.io tags look like 2026.11.1-ls264",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["lscr.io/linuxserver/**"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "lscr.io/linuxserver/**"
+      ],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-ls(?<build>\\d+))?$"
     },
     {
-      "matchManagers": ["github-actions"],
+      "description": "Skip 5.3.0. Also skip 20.04.x, old linuxserver tags under a former scheme (real qBittorrent versions are 5.x)",
+      "matchPackageNames": [
+        "lscr.io/linuxserver/qbittorrent"
+      ],
+      "allowedVersions": "!/^(20\\.|5\\.3\\.0($|-))/"
+    },
+    {
+      "description": "Immich pins its Postgres; a major bump needs a dump/restore, so follow Immich's upgrade notes instead",
+      "matchPackageNames": [
+        "ghcr.io/immich-app/postgres"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
       "groupName": "github actions",
       "commitMessagePrefix": "[ci]"
     }
