@@ -1,0 +1,106 @@
+services:
+  # hosted Django
+  web:
+    build: ../../build/strathcona-power
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+      # - DJANGO_SECRET_KEY=${SPL_DJ_SECRET_KEY}
+      # - DEBUG=${SPL_DJ_DEBUG}
+      # - DJANGO_LOGLEVEL=${SPL_DJ_LOGLEVEL}
+      # - DJANGO_ALLOWED_HOSTS=${SPL_DJ_ALLOWED_HOSTS}
+      # - DATABASE_ENGINE=${SPL_DJ_DATABASE_ENGINE}
+      # - DATABASE_NAME=${SPL_DJ_DB_DATABASE_NAME}
+      # - DATABASE_USERNAME=${SPL_DJ_DB_USERNAME}
+      # - DATABASE_PASSWORD=${SPL_DJ_DB_PASSWORD}
+      # - DATABASE_HOST=${SPL_DJ_DB_HOSTNAME}
+      # - DATABASE_PORT=${SPL_DJ_DB_PORT}
+
+      - SPL_DJ_DB_DATABASE_NAME=${SPL_DJ_DB_DATABASE_NAME}
+      - SPL_DJ_DB_PASSWORD=${SPL_DJ_DB_PASSWORD}
+      - SPL_DJ_DB_USERNAME=${SPL_DJ_DB_USERNAME}
+      - SPL_DJ_DB_HOSTNAME=${SPL_DJ_DB_HOSTNAME}
+      - SPL_DJ_DB_PORT=${SPL_DJ_DB_DIRECT_PORT}
+      - SPL_DJ_SECRET_KEY=${SPL_DJ_SECRET_KEY}
+      - SPL_DJ_DEBUG=${SPL_DJ_DEBUG}
+      - SPL_DJ_LOGLEVEL=${SPL_DJ_LOGLEVEL}
+      - SPL_DJ_ALLOWED_HOSTS=${SPL_DJ_ALLOWED_HOSTS}
+      # - SPL_DJ_DEFAULT_FROM_EMAIL=${SPL_DJ_DEFAULT_FROM_EMAIL}
+      # - SPL_DJ_SERVER_EMAIL=${SPL_DJ_SERVER_EMAIL}
+      # - SPL_DJ_EMAIL_SUBJECT_PREFIX=${SPL_DJ_EMAIL_SUBJECT_PREFIX}
+      - SPL_DJ_GOOGLE_ADS_CUSTOMER_IDS=${SPL_DJ_GOOGLE_ADS_CUSTOMER_IDS}
+      - SPL_DJ_GOOGLE_ADS_CLIENT_ID=${SPL_DJ_GOOGLE_ADS_CLIENT_ID}
+      - SPL_DJ_GOOGLE_ADS_CLIENT_SECRET=${SPL_DJ_GOOGLE_ADS_CLIENT_SECRET}
+      - SPL_DJ_GOOGLE_ADS_REFRESH_TOKEN=${SPL_DJ_GOOGLE_ADS_REFRESH_TOKEN}
+      - SPL_DJ_META_ADS_ACCOUNT_IDS=${SPL_DJ_META_ADS_ACCOUNT_IDS}
+      - SPL_DJ_META_ADS_ACCESS_TOKEN=${SPL_DJ_META_ADS_ACCESS_TOKEN}
+
+    # volumes:
+    ports:
+      - ${SPL_DJ_PORT}:8000  # 9800:8000
+      # - ${SPL_DJ_PORT}:${SPL_DJ_PORT}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthcheck/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - db
+    # restart: unless-stopped
+    # labels
+
+  # DB for Django (PostgreSQL)
+  # Back setup under the "Meta" stack
+  db:
+    container_name: strathcona-power-db
+    image: postgres:18
+    hostname: ${SPL_DJ_DB_HOSTNAME}
+    environment:
+      - POSTGRES_PASSWORD=${SPL_DJ_DB_PASSWORD}
+      - POSTGRES_USER=${SPL_DJ_DB_USERNAME}
+      - POSTGRES_DB=${SPL_DJ_DB_DATABASE_NAME}
+      - POSTGRES_INITDB_ARGS='--data-checksums'
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/strathcona-power-db:/var/lib/postgresql
+    ports:
+      - ${SPL_DJ_DB_PORT}:5432  # 9802:5432
+    # healthcheck:
+    #   test: ["CMD", "pg_isready", "-U", "postgres"]
+    restart: unless-stopped
+
+  # MailPit ?
+  # STMP server
+  # https://github.com/axllent/mailpit/
+
+
+  timetagger:
+    image: ghcr.io/almarklein/timetagger:latest
+    container_name: timetagger
+    environment:
+      - TIMETAGGER_BIND=0.0.0.0:80
+      - TIMETAGGER_DATADIR=/root/_timetagger
+      - TIMETAGGER_LOG_LEVEL=info
+      # username:bcrypt-hash, set in .env; generate using  https://timetagger.app/cred
+      # in .env, wrap the value in single quotes so the $ signs aren't interpolated
+      - TIMETAGGER_CREDENTIALS=${TIMETAGGER_CREDENTIALS}
+    volumes:
+      - ${DOCKER_USERDIR}/volumes/timetagger:/root/_timetagger
+    ports:
+      - 9808:80
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.timetagger.rule=Host("time.${LOCAL_DOMAIN_NAME}")
+      - traefik.http.routers.timetagger.entrypoints=web
+
+
+
+networks:
+  default:
+    external: true
+    name: meta_external
