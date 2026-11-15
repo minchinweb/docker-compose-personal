@@ -10,7 +10,7 @@
 services:
   # meta
   traefik:
-    image: traefik:2.11
+    image: traefik:3.7
     command:
       # - --configFile=/config/traefik.old.toml
       # - --accessLog.filePath=/var/log/access.log
@@ -103,8 +103,7 @@ services:
 
   traefik-certs-dumper:
     # allows the certificates to be used by other services
-    # may need to update when I bump Traefik to v3
-    image: ldez/traefik-certs-dumper:v2.10.0
+    image: ldez/traefik-certs-dumper:v2.11.4
     user: ${PUID}:${PGID}
     depends_on:
       traefik:
@@ -115,7 +114,7 @@ services:
       || ! [ `jq ".[] | .Certificates | length" /data/acme/acme.json | jq -s "add" ` != 0 ]; do
       sleep 1
       ; done
-      && traefik-certs-dumper file --version v2 --watch
+      && traefik-certs-dumper file --version v3 --watch
       --source /data/acme/acme.json --dest /data/shared/certs'
     volumes:
       - ${DOCKER_USERDIR}/volumes/traefik/acme:/data/acme:ro
