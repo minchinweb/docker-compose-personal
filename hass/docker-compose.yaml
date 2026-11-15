@@ -109,7 +109,7 @@ services:
     container_name: zwave-js-ui
     hostname: zwave
     environment:
-      - SESSION_SECRET=mysupersecretkey
+      - SESSION_SECRET=${ZWAVE_SESSION_SECRET}  # signs web UI sessions only; not the Z-Wave network keys
       - ZWAVEJS_EXTERNAL_CONFIG=/usr/src/app/store/.config-db
       # Uncomment if you want logs time and dates to match your timezone instead of UTC
       # Available at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
