@@ -5,7 +5,9 @@
 
 ## DIUN -- https://crazymax.dev/diun/  -- update monitoring
 ## Dockge -- https://github.com/louislam/dockge -- Docker compose/stack manager
-## Uptime-Kuma -- https://github.com/louislam/uptime-kuma -- moonitoring tool
+## Gatus -- https://github.com/TwiN/gatus -- health checks/uptime, config in YAML (lighter than Uptime-Kuma)
+## ntfy -- https://ntfy.sh/ -- push notifications (arrs, HASS, Forgejo, db-backup, DIUN, Gatus)
+## Uptime-Kuma -- https://github.com/louislam/uptime-kuma -- monitoring tool
 
 services:
   portainer:
